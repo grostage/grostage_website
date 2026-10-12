@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getWork, getWorks } from '@/backend/lib/content';
 import { chapters } from '@/frontend/lib/render';
+import StageDivider from '@/frontend/components/StageDivider';
 import CTA from '@/frontend/components/CTA';
 import ReadingProgress from '@/frontend/components/ReadingProgress';
 import TextFill from '@/frontend/components/TextFill';
@@ -35,6 +36,7 @@ export default async function WorkDetail({ params }) {
       <ul className="cs-tags">{work.tags.map((tag, i) => <li key={tag} style={{ '--d': i }}>{tag}</li>)}</ul>
     </CaseHero>
 
+    <StageDivider from="#060908" to="#f0f3ef" />
     <section className="cs-overview" data-nav-theme="light">
       <p className="cs-kicker" data-rx>The idea</p>
       <TextFill className="cs-statement" text={work.excerpt || work.title} />
@@ -54,6 +56,7 @@ export default async function WorkDetail({ params }) {
       </article>)}
     </section>
 
+    <StageDivider from="#f0f3ef" to="#060908" flip />
     {work.gallery && <CaseGallery image={work.gallery} alt={`${work.title} project gallery`} />}
 
     <Link href={`/work/${next.slug}`} className="cs-next" data-nav-theme="dark" data-cursor="Next">

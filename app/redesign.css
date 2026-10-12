@@ -344,3 +344,37 @@
   .cs-label,.cs-tags li,.ar-lead,.ar-hero .cs-back{animation:none}
   .cs-next img,.cs-next-title{transition:none}
 }
+
+/* ==================== Stepped block wipe at section seams ==================== */
+/* A zero-height marker at the seam; columns grow upward over the previous section. */
+.stage-divider{position:relative;height:0;z-index:6;pointer-events:none}
+.sd-col{position:absolute;top:calc(var(--sd-up,0px) * -1);width:calc(20% + 2px);margin-left:-1px;height:calc(var(--sd-up,0px) + var(--sd-down,0px) + 1px);overflow:hidden;
+  background:linear-gradient(to bottom,transparent calc(var(--sd-up,0px) - 1px),var(--sd-from) calc(var(--sd-up,0px) - 1px))}
+.sd-col:nth-child(1){left:0}.sd-col:nth-child(2){left:20%}.sd-col:nth-child(3){left:40%}.sd-col:nth-child(4){left:60%}.sd-col:nth-child(5){left:80%}
+.sd-accent,.sd-block{position:absolute;inset:0;will-change:transform}
+.sd-accent{background:var(--sd-accent)}
+.sd-block{background:var(--sd-to)}
+.stage-divider:not(.is-armed){display:none}
+
+/* Loading cover and page-change curtain: plain black */
+.gs-preloader{background:#000!important}
+.gs-preloader>*{display:none!important}
+.gs-curtain{background:#000!important}
+.gs-curtain>*{display:none!important}
+
+/* Keep the last row of each section clear of the stepped wipe (same total height). */
+.page-intro.rx-intro{padding-top:clamp(120px,12vw,160px)!important;padding-bottom:clamp(80px,10vw,150px)!important}
+.rx-intro-foot{padding-bottom:clamp(30px,4vw,50px)}
+.stage-hero{padding-bottom:clamp(110px,12vw,170px)!important}
+.project-theatre{padding-bottom:clamp(100px,11vw,160px)!important}
+.cs-hero-copy{bottom:clamp(110px,12vw,170px)}
+.ar-hero{padding-top:clamp(120px,13vw,170px);padding-bottom:clamp(100px,11vw,160px)}
+.svx{padding-bottom:clamp(100px,11vw,160px)}
+.dimensional-reel .reel-controls{bottom:clamp(100px,11vw,160px)!important}
+.dimensional-reel .reel-stage{top:46%!important}
+.dimensional-reel .reel-instruction{display:none}
+/* Seal the hairline where neighbouring columns meet. */
+.sd-accent,.sd-block{left:-1px;right:-1px}
+
+/* Hero pause control sits on the bottom row, clear of the seam zone */
+.stage-hero .video-toggle{bottom:calc(clamp(110px,12vw,170px) + 4px)}

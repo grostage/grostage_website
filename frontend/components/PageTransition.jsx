@@ -41,5 +41,5 @@ export default function PageTransition() {
       onComplete: () => { clearTimeout(fallback.current); busy.current = false; gsap.set(el.current, { clipPath: HIDDEN }); ScrollTrigger.refresh(); } });
   }, [path]);
 
-  return <div ref={el} className="gs-curtain" aria-hidden="true"><span>Grostage</span></div>;
+  return <div ref={el} className="gs-curtain" aria-hidden="true" />;
 }

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { q } from '@/backend/lib/db';
 import { samplePosts } from '@/backend/lib/content';
 import { chapters } from '@/frontend/lib/render';
+import StageDivider from '@/frontend/components/StageDivider';
 import CTA from '@/frontend/components/CTA';
 import ReadingProgress from '@/frontend/components/ReadingProgress';
 import { CaseGallery } from '@/frontend/components/CaseStudy';
@@ -23,10 +24,12 @@ export default async function Post({ params }) {
       {p.sample && <p className="rx-note ar-note">Sample editorial · Adapted from the company profile</p>}
     </section>
     {p.image && <CaseGallery image={p.image} alt={p.title} />}
+    <StageDivider from="#060908" to="#f0f3ef" />
     <article className="ar-body" data-nav-theme="light">
       {intro.map((t, i) => <p key={i} className={i === 0 ? 'ar-first' : ''} data-rx>{t}</p>)}
       {list.map(c => <section key={c.title}><h2 data-rx>{c.title}</h2>{c.body.map((t, n) => <p key={n} data-rx>{t}</p>)}</section>)}
     </article>
+    <StageDivider from="#f0f3ef" to="#060908" flip />
     <CTA />
   </main>;
 }

@@ -1,4 +1,5 @@
 import PageIntro from '@/frontend/components/PageIntro';
+import StageDivider from '@/frontend/components/StageDivider';
 import CTA from '@/frontend/components/CTA';
 import { VisionMission, ProcessStepper, Team } from '@/frontend/components/AboutSections';
 import { steps } from '@/backend/lib/content';
@@ -7,6 +8,7 @@ const people = [['Sanal P K', 'Founder & CEO', 'Business strategy, product direc
 export default function About() {
   return <main id="main-content">
     <PageIntro label="WHO WE ARE" title="One team." accent="Your next stage." description="We are Grostage. A technology and digital growth company building what businesses need next." />
+    <StageDivider from="#060908" to="#f0f3ef" />
     <section className="rx rx-light rx-story">
       <figure className="rx-story-media" data-rx><img src="/projects/profile-13-0.jpeg" alt="Flowing abstract ribbon from the Grostage company profile" /></figure>
       <div className="rx-story-copy">
@@ -16,8 +18,11 @@ export default function About() {
         <ul className="rx-tags" data-rx style={{ '--d': 3 }}>{['Strategy', 'Design', 'Technology', 'Growth'].map(t => <li key={t}>{t}</li>)}</ul>
       </div>
     </section>
+    <StageDivider from="#f0f3ef" to="#060908" flip />
     <VisionMission />
+    <StageDivider from="#060908" to="#f0f3ef" />
     <ProcessStepper steps={steps} />
+    <StageDivider from="#f0f3ef" to="#060908" flip />
     <Team people={people} />
     <CTA />
   </main>;
