@@ -1,6 +1,24 @@
 import PageIntro from '@/frontend/components/PageIntro';
-import Reveal from '@/frontend/components/Reveal';
 import CTA from '@/frontend/components/CTA';
-import {steps} from '@/backend/lib/content';
-export const metadata={title:'About Us — Grostage'};
-export default function About(){return <main id="main-content"><PageIntro label="WHO WE ARE" title="One team." accent="Your next stage." description="We are Grostage. A technology and digital growth company building what businesses need next." /><section className="about-feature wrap"><img src="/projects/profile-13-0.jpeg" alt="Flowing abstract ribbon from the Grostage company profile" /><div><p className="eyebrow">STRATEGY × DESIGN × TECHNOLOGY × GROWTH</p><h2>Technology with a<br /><span className="serif">business purpose.</span></h2><p>We help businesses turn ideas, operational challenges and growth opportunities into practical digital solutions.</p><p>From websites and e-commerce experiences to custom software, ERP systems, automation, AI solutions and digital marketing, we bring strategy, design, technology and execution together under one team.</p></div></section><section className="sec wrap"><div className="two"><Reveal><p className="eyebrow">01 / OUR VISION</p><h2 className="h2">Built for<br /><span className="serif">lasting value.</span></h2><p className="sub">To build Grostage into a globally recognized technology company, creating scalable SaaS products that solve real business problems and deliver lasting value across markets.</p></Reveal><Reveal delay={.1}><p className="eyebrow">02 / OUR MISSION</p><h2 className="h2">Make business<br /><span className="serif">work better.</span></h2><p className="sub">To simplify business operations through practical software, automation and subscription-based digital products that help businesses operate more efficiently, make better decisions and grow with confidence.</p></Reveal></div></section><section className="sec light" id="approach"><div className="wrap"><p className="eyebrow">HOW WE WORK</p><h2 className="h2">From business problem<br /><span className="serif">to business outcome.</span></h2><div className="process-grid">{steps.map(([title,desc],i)=><Reveal key={title} delay={i*.05}><div className="process-item"><span>0{i+1}</span><h3>{title}</h3><p>{desc}</p></div></Reveal>)}</div></div></section><section className="sec wrap"><p className="eyebrow">THE PEOPLE BEHIND GROSTAGE</p><h2 className="h2">Shared purpose.<br /><span className="serif">Different perspectives.</span></h2><div className="team-grid">{[['Sanal P K','Founder & CEO','Business strategy, product direction and growth.'],['Pranav','Chief Business Officer','Strategic relationships, partnerships and expansion.'],['Vishnu','Head of Operations','Project coordination, delivery and client collaboration.'],['Hari','Technical Officer','Software development, engineering and technical execution.']].map(([name,role,desc],i)=><div className="team-card" key={name}><span className="team-number">0{i+1}</span><h3>{name}</h3><p className="eyebrow">{role}</p><p>{desc}</p></div>)}</div></section><CTA /></main>;}
+import { VisionMission, ProcessStepper, Team } from '@/frontend/components/AboutSections';
+import { steps } from '@/backend/lib/content';
+export const metadata = { title: 'About Us — Grostage' };
+const people = [['Sanal P K', 'Founder & CEO', 'Business strategy, product direction and growth.'], ['Pranav', 'Chief Business Officer', 'Strategic relationships, partnerships and expansion.'], ['Vishnu', 'Head of Operations', 'Project coordination, delivery and client collaboration.'], ['Hari', 'Technical Officer', 'Software development, engineering and technical execution.']];
+export default function About() {
+  return <main id="main-content">
+    <PageIntro label="WHO WE ARE" title="One team." accent="Your next stage." description="We are Grostage. A technology and digital growth company building what businesses need next." />
+    <section className="rx rx-light rx-story">
+      <figure className="rx-story-media" data-rx><img src="/projects/profile-13-0.jpeg" alt="Flowing abstract ribbon from the Grostage company profile" /></figure>
+      <div className="rx-story-copy">
+        <h2 data-rx>Technology with a<br /><span className="rx-accent">business purpose.</span></h2>
+        <p data-rx style={{ '--d': 1 }}>We help businesses turn ideas, operational challenges and growth opportunities into practical digital solutions.</p>
+        <p data-rx style={{ '--d': 2 }}>From websites and e-commerce experiences to custom software, ERP systems, automation, AI solutions and digital marketing, we bring strategy, design, technology and execution together under one team.</p>
+        <ul className="rx-tags" data-rx style={{ '--d': 3 }}>{['Strategy', 'Design', 'Technology', 'Growth'].map(t => <li key={t}>{t}</li>)}</ul>
+      </div>
+    </section>
+    <VisionMission />
+    <ProcessStepper steps={steps} />
+    <Team people={people} />
+    <CTA />
+  </main>;
+}

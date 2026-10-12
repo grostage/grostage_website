@@ -111,13 +111,20 @@ export function Process() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const rows = gsap.utils.toArray('.hx-row', root.current);
-      gsap.set(rows, { autoAlpha: 0, y: 40 });
-      ScrollTrigger.batch(rows, { start: 'top 88%', once: true, onEnter: b => gsap.to(b, { autoAlpha: 1, y: 0, stagger: 0.12, duration: 0.9, ease: 'power3.out' }) });
+      // Rows stay readable by default; the rail only dims what has not been reached yet.
+      const section = root.current, list = section.querySelector('.process-rows');
+      const rows = gsap.utils.toArray('.hx-row', section);
+      section.classList.add('rail-ready');
+      gsap.fromTo(section.querySelector('.process-rail i'), { scaleY: 0 }, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: list, start: 'top 60%', end: 'bottom 60%', scrub: .6 } });
+      const triggers = rows.map(row => ScrollTrigger.create({ trigger: row, start: 'top 60%', end: 'bottom 60%', onToggle: self => row.classList.toggle('is-current', self.isActive), onEnter: () => row.classList.add('is-lit'), onLeaveBack: () => row.classList.remove('is-lit') }));
+      return () => { section.classList.remove('rail-ready'); triggers.forEach(t => t.kill()); rows.forEach(row => row.classList.remove('is-lit', 'is-current')); };
     });
+    return () => mm.revert();
   }, { scope: root });
   return <section className="hx hx-process" ref={root}>
     <div className="hx-head"><p className="hx-tag"><i /> HOW WE WORK</p><h2>From first idea <span className="serif">to continuous growth.</span></h2></div>
-    {steps.map(([n, t, d]) => <div className="hx-row" key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></div>)}
+    <div className="process-rows"><span className="process-rail" aria-hidden="true"><i /></span>
+      {steps.map(([n, t, d]) => <div className="hx-row" key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></div>)}
+    </div>
   </section>;
 }

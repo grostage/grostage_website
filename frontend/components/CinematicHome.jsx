@@ -1,8 +1,9 @@
 'use client';
 import { useRef, useState } from 'react';
 import Link from 'next/link';
-import { gsap, useGSAP, ready } from '@/frontend/lib/gsap';
+import { gsap, ScrollTrigger, useGSAP, ready } from '@/frontend/lib/gsap';
 import Magnetic from './Magnetic';
+import HeroVideo from './HeroVideo';
 
 export function StageHero() {
   const root = useRef(null);
@@ -14,7 +15,6 @@ export function StageHero() {
         .from('.stage-title > span > span', { yPercent: 110, rotate: 3, stagger: .12, duration: 1.2, ease: 'power4.out' })
         .from('.stage-meta,.stage-bottom', { opacity: 0, y: 16, duration: .8, stagger: .1 }, .45);
       ready().then(() => { if (alive) intro.play(); });
-      gsap.to('.stage-art img', { scale: 1.12, rotate: -4, duration: 8, repeat: -1, yoyo: true, ease: 'sine.inOut', scrollTrigger: { trigger: root.current, start: 'top bottom', end: 'bottom top', toggleActions: 'play pause resume pause' } });
       gsap.to('.stage-title', { yPercent: 25, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: 1 } });
       return () => { alive = false; };
     });
@@ -30,7 +30,7 @@ export function StageHero() {
     return () => mm.revert();
   }, { scope: root });
   return <section className="stage-hero" data-nav-theme="dark" ref={root}>
-    <div className="stage-art" aria-hidden="true"><img src="/projects/profile-13-0.jpeg" alt="" fetchPriority="high" /></div>
+    <HeroVideo />
     <div className="stage-meta"><span><i /> INDEPENDENT MINDS. CONNECTED THINKING.</span><span>STRATEGY / DESIGN / TECHNOLOGY</span></div>
     <h1 className="stage-title"><span><span>Ideas beyond</span></span><span className="stage-title-last"><span>the ordinary<span className="stage-period">.</span></span></span></h1>
     <div className="stage-bottom"><p>We turn ambition into digital experiences.<br />Thoughtfully designed. Intelligently built.</p><Magnetic><Link className="stage-pill" href="/work" data-cursor="Explore">Step into our work <span aria-hidden="true">↗</span></Link></Magnetic><a className="stage-scroll" href="#hx-about">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a></div>
@@ -47,8 +47,12 @@ export function ProjectTheatre({ works }) {
       const el = root.current;
       const atmosphere = el.querySelector('.theatre-atmosphere');
       gsap.to(atmosphere, { yPercent: 12, xPercent: -4, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 1.4 } });
-      gsap.to(el.querySelector('.theatre-orb-a'), { x: 90, y: -55, scale: 1.12, duration: 14, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-      gsap.to(el.querySelector('.theatre-orb-b'), { x: -70, y: 70, scale: .86, duration: 17, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      // Ambient motion only runs while the section is on screen.
+      const ambient = [
+        gsap.to(el.querySelector('.theatre-orb-a'), { x: 90, y: -55, scale: 1.12, duration: 14, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true }),
+        gsap.to(el.querySelector('.theatre-orb-b'), { x: -70, y: 70, scale: .86, duration: 17, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true }),
+      ];
+      ScrollTrigger.create({ trigger: el, start: 'top bottom', end: 'bottom top', onToggle: self => { ambient.forEach(t => self.isActive ? t.play() : t.pause()); el.classList.toggle('is-onscreen', self.isActive); } });
       return () => gsap.killTweensOf([atmosphere, el.querySelector('.theatre-orb-a'), el.querySelector('.theatre-orb-b')]);
     });
     mm.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {

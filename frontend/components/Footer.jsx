@@ -11,7 +11,7 @@ export default async function Footer() {
         <div><h4>Follow</h4>{parseLinks(f.socials).map(l => <a key={l.label} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)}</div>
         <div><h4>Contact</h4>{f.email && <a href={'mailto:' + f.email}>{f.email}</a>}{f.phone && <a href={'tel:' + f.phone}>{f.phone}</a>}{f.address && <span className="mut">{f.address}</span>}</div>
       </div>
-      <span className="footer-wordmark" aria-hidden="true">grostage®</span>
+      <span className="footer-wordmark" aria-hidden="true">{[...'grostage®'].map((c, i) => <span key={i} style={{ '--i': i }}>{c}</span>)}</span>
       <div className="f-bot"><span>{f.copyright}</span><Link href="/admin">Admin</Link></div>
     </div></footer>
   );

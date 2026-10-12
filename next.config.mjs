@@ -8,4 +8,8 @@ export default phase => ({
   serverExternalPackages: ['pg'],
   // Avoid worker creation failures on restricted Windows environments.
   experimental: { workerThreads: false, cpus: 1 },
+  // Hero video files are versioned by name; let browsers and the CDN keep them.
+  async headers() {
+    return [{ source: '/video/:file*', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] }];
+  },
 });

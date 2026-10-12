@@ -1,9 +1,16 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 export default function ContactForm() {
   const [s,setS] = useState({name:'',email:'',message:''});
   const [status,setStatus] = useState('');
   const [pending,setPending] = useState(false);
+  // Services chosen on the Services page arrive as ?interest=… and start the message.
+  useEffect(() => {
+    const interest = new URLSearchParams(location.search).get('interest');
+    if (interest) setS(v => v.message ? v : {...v, message: `I'm interested in: ${interest.slice(0, 300)}.
+
+`});
+  }, []);
   const send = async e => {
     e.preventDefault(); if(pending) return; setPending(true); setStatus('');
     try {
@@ -14,5 +21,5 @@ export default function ContactForm() {
     } catch {setStatus('Your message could not be sent. Please try again or email info@grostage.com.');}
     finally {setPending(false);}
   };
-  return <form onSubmit={send} className="cform"><label htmlFor="contact-name">Your name<input id="contact-name" autoComplete="name" required maxLength={150} placeholder="What should we call you?" value={s.name} onChange={e=>setS({...s,name:e.target.value})} /></label><label htmlFor="contact-email">Email address<input id="contact-email" type="email" autoComplete="email" required maxLength={254} placeholder="you@company.com" value={s.email} onChange={e=>setS({...s,email:e.target.value})} /></label><label htmlFor="contact-message">What are you thinking?<textarea id="contact-message" rows={5} required maxLength={10000} placeholder="A little about your idea, business or challenge…" value={s.message} onChange={e=>setS({...s,message:e.target.value})} /></label><button className="btn" disabled={pending}>{pending ? 'Sending…' : 'Let’s start a conversation'}<span>↗</span></button><p className="form-status" role="status" aria-live="polite">{status}</p></form>;
+  return <form onSubmit={send} className="cform"><label htmlFor="contact-name" className="rx-field"><input id="contact-name" autoComplete="name" required maxLength={150} placeholder=" " value={s.name} onChange={e=>setS({...s,name:e.target.value})} /><span>Your name</span></label><label htmlFor="contact-email" className="rx-field"><input id="contact-email" type="email" autoComplete="email" required maxLength={254} placeholder=" " value={s.email} onChange={e=>setS({...s,email:e.target.value})} /><span>Email address</span></label><label htmlFor="contact-message" className="rx-field"><textarea id="contact-message" rows={5} required maxLength={10000} placeholder=" " value={s.message} onChange={e=>setS({...s,message:e.target.value})} /><span>What are you thinking?</span></label><button className="btn" disabled={pending}>{pending ? 'Sending…' : 'Let’s start a conversation'}<span>↗</span></button><p className={"form-status"+(status.startsWith("Thank")?" is-ok":status?" is-err":"")} role="status" aria-live="polite">{status}</p></form>;
 }

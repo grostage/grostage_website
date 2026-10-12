@@ -17,7 +17,7 @@ export default function Nav() {
       const target = Math.min(1, Math.max(0, window.scrollY / 280));
       progress = media.matches ? target : progress + (target - progress) * .15;
       const nav = header.current;
-      nav?.style.setProperty('--nav-p', progress.toFixed(5));
+      // Read layout before writing styles, so each frame costs one layout pass.
       if (nav) {
         const y = nav.getBoundingClientRect().bottom / 2 + 5;
         // Inspect explicit surfaces, not the fixed header itself.
@@ -30,6 +30,7 @@ export default function Nav() {
           }
         }
         nav.dataset.theme = theme;
+        nav.style.setProperty('--nav-p', progress.toFixed(5));
       }
       frame = Math.abs(target - progress) > .0001 ? requestAnimationFrame(paint) : 0;
     };

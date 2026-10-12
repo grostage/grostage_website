@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { gsap, useGSAP, ready } from '@/frontend/lib/gsap';
+import { ServiceArt, ServiceIcon } from './ServiceIcon';
 
 export function ExperienceHero({ works = [] }) {
   const root = useRef(null);
@@ -38,11 +39,23 @@ export function ExperienceHero({ works = [] }) {
 
 export function ExperienceServices({ services }) {
   const [active, setActive] = useState(0);
+  // The stage keeps showing the last opened capability when every row is collapsed.
+  const [shown, setShown] = useState(0);
+  const open = i => { setActive(i); if (i > -1) setShown(i); };
+  const preview = i => { if (matchMedia('(hover: hover) and (pointer: fine)').matches && i !== active) open(i); };
+  const s = services[shown];
   return <section className="experience-services">
-    <div className="experience-section-heading"><p className="studio-label">01 / OUR CAPABILITIES</p><h2>Different disciplines.<br /><span className="serif">One shared ambition.</span></h2><p>From the first question to the next big opportunity. The right expertise, working together.</p></div>
-    <div className="capability-list">{services.map((s, i) => <article key={s.slug} className={`capability-row${active === i ? ' is-active' : ''}`}>
-      <button className="capability-toggle" aria-expanded={active === i} aria-controls={`capability-${s.slug}`} onClick={() => setActive(active === i ? -1 : i)}><small>0{i + 1}</small><span>{s.title}</span><b aria-hidden="true">{active === i ? '−' : '+'}</b></button>
-      <div id={`capability-${s.slug}`} className="capability-panel" inert={active !== i ? true : undefined}><div><span className="capability-symbol" aria-hidden="true">{s.icon}</span><p>{s.detail}</p><div><ul>{s.items.map(item => <li key={item}>{item}</li>)}</ul><Link href={`/services#${s.slug}`}>Explore the capability <span>↗</span></Link></div></div></div>
+    <div className="experience-section-heading"><p className="studio-label">01 / OUR CAPABILITIES</p><h2>Different disciplines.<br /><span className="serif">One shared ambition.</span></h2><p>From the first question to the next big opportunity. The right expertise, working together.</p>
+      <Link href={`/services#${s.slug}`} className="capability-stage" aria-label={`Explore ${s.title}`} data-cursor="Explore">
+        <div className="capability-stage-top"><span>0{shown + 1}</span><span>{s.title}</span></div>
+        <ServiceArt key={s.slug} slug={s.slug} />
+        <ul key={s.slug + '-items'}>{s.items.map((item, n) => <li key={item} style={{ '--n': n }}>{item}</li>)}</ul>
+        <span className="capability-stage-meter" aria-hidden="true">{services.map((x, i) => <i key={x.slug} className={i === shown ? 'on' : ''} />)}</span>
+      </Link>
+    </div>
+    <div className="capability-list">{services.map((s, i) => <article key={s.slug} className={`capability-row${active === i ? ' is-active' : ''}`} onPointerEnter={() => preview(i)}>
+      <button className="capability-toggle" aria-expanded={active === i} aria-controls={`capability-${s.slug}`} onClick={() => open(active === i ? -1 : i)}><small>0{i + 1}</small><span>{s.title}</span><b aria-hidden="true"><i /><i /></b></button>
+      <div id={`capability-${s.slug}`} className="capability-panel" inert={active !== i ? true : undefined}><div><ServiceIcon slug={s.slug} size={30} className="capability-symbol" /><p>{s.detail}</p><div><ul>{s.items.map(item => <li key={item}>{item}</li>)}</ul><Link href={`/services#${s.slug}`}>Explore the capability <span>↗</span></Link></div></div></div>
     </article>)}</div>
   </section>;
 }
