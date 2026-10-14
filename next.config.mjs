@@ -5,6 +5,8 @@ export default phase => ({
   // Vercel expects the standard Next.js production output directory.
   // Keep development isolated to avoid clashes with local production builds.
   distDir: phase === 'phase-development-server' ? '.next-dev' : '.next',
+  // Self-contained server bundle for Node hosts such as Hostinger.
+  output: 'standalone',
   serverExternalPackages: ['pg'],
   // Avoid worker creation failures on restricted Windows environments.
   experimental: { workerThreads: false, cpus: 1 },
