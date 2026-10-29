@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { gsap } from '@/frontend/lib/gsap';
 import Logo from './Logo';
-const navigation = [['Home', '/'], ['About Us', '/about'], ['Services', '/services'], ['Our Work', '/work'], ['Blog', '/blog'], ['Client Stories', '/client-stories']];
+const navigation = [['Home', '/'], ['About Us', '/about'], ['Services', '/services'], ['Our Work', '/work'], ['Client Stories', '/client-stories']];
+// The sidebar menu. On small screens the top links are hidden, so they join it there.
+const sidebar = [['Blog', '/blog'], ['Clients', '/clients'], ['Contact us', '/contact']];
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const header = useRef(null), menu = useRef(null), toggle = useRef(null);
@@ -73,7 +75,7 @@ export default function Nav() {
       document.removeEventListener('keydown', key);
     };
   }, [open]);
-  const dark = ['/', '/about', '/services', '/work', '/blog', '/client-stories', '/contact'].includes(pathname);
+  const dark = ['/', '/about', '/services', '/work', '/blog', '/clients', '/client-stories', '/contact'].includes(pathname);
   return <>
     <header ref={header} data-theme={dark ? 'dark' : 'light'} className={`nav studio-nav fluid-nav${open ? ' is-open' : ''}`}><div className="wrap nav-in"><Logo />
       <nav className="nav-links" aria-label="Main navigation">{navigation.map(([label, href]) => <Link key={href} href={href} aria-current={(href === '/' ? pathname === '/' : pathname.startsWith(href)) ? 'page' : undefined}>{label}</Link>)}</nav>
@@ -81,7 +83,7 @@ export default function Nav() {
       <button ref={toggle} className="burger" aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} aria-controls="studio-navigation" onClick={() => setOpen(!open)}><i /><i /></button>
     </div></header>
     <div ref={menu} id="studio-navigation" className="studio-menu" data-lenis-prevent role="dialog" aria-modal={open ? true : undefined} aria-label="Explore Grostage" aria-hidden={!open}>
-      <nav aria-label="Expanded navigation">{navigation.map(([label, href], i) => <Link key={href} href={href} onClick={() => setOpen(false)}><small>0{i + 1}</small>{label}</Link>)}</nav>
+      <nav aria-label="Expanded navigation">{sidebar.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{label}</Link>)}{navigation.map(([label, href]) => <Link key={href} href={href} className="studio-menu-main" onClick={() => setOpen(false)}>{label}</Link>)}</nav>
       <div className="studio-menu-aside"><p>New perspectives.<br />Meaningful experiences.<br />Your next stage.</p><Link href="/contact" onClick={() => setOpen(false)}>Start a conversation ↗</Link><span>STRATEGY / DESIGN / TECHNOLOGY</span></div>
     </div>
   </>;

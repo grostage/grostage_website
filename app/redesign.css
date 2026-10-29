@@ -346,15 +346,46 @@
 }
 
 /* ==================== Stepped block wipe at section seams ==================== */
-/* A zero-height marker at the seam; columns grow upward over the previous section. */
-.stage-divider{position:relative;height:0;z-index:6;pointer-events:none}
-.sd-col{position:absolute;top:calc(var(--sd-up,0px) * -1);width:calc(20% + 2px);margin-left:-1px;height:calc(var(--sd-up,0px) + var(--sd-down,0px) + 1px);overflow:hidden;
-  background:linear-gradient(to bottom,transparent calc(var(--sd-up,0px) - 1px),var(--sd-from) calc(var(--sd-up,0px) - 1px))}
-.sd-col:nth-child(1){left:0}.sd-col:nth-child(2){left:20%}.sd-col:nth-child(3){left:40%}.sd-col:nth-child(4){left:60%}.sd-col:nth-child(5){left:80%}
-.sd-accent,.sd-block{position:absolute;inset:0;will-change:transform}
-.sd-accent{background:var(--sd-accent)}
-.sd-block{background:var(--sd-to)}
-.stage-divider:not(.is-armed){display:none}
+/* Sits at the seam; a staircase of the next section's colour climbs over the outgoing one. */
+.stage-divider{position:relative;height:0;z-index:30;pointer-events:none}
+/* Accent frame that closes in around the last screen of the outgoing section. */
+.sd-frame{position:absolute;left:0;right:0;bottom:0;height:100vh;height:100svh;--sd-edge:0px;border:solid var(--sd-accent);border-width:0 var(--sd-edge) var(--sd-edge);pointer-events:none}
+.sd-col{position:absolute;bottom:0;left:calc(var(--i) * 100% / 6);width:calc(100% / 6 + 2px);margin-left:-1px;height:calc(12vh + var(--i) * 8vh);overflow:hidden}
+.sd-block-wrap{position:absolute;inset:0;transform:translateY(101%);will-change:transform}
+/* The accent riser leads each step, like a coloured stair nosing. */
+.sd-accent{position:absolute;top:0;left:-1px;right:-1px;height:clamp(28px,6vh,64px);background:var(--sd-accent)}
+.sd-block{position:absolute;top:clamp(28px,6vh,64px);bottom:0;left:-1px;right:-1px;background:var(--sd-to)}
+
+@media(min-width:901px){
+  .stage-hero{padding-bottom:clamp(110px,12vw,170px)!important}
+  .stage-hero .video-toggle{bottom:calc(clamp(110px,12vw,170px) + 4px)}
+}
+
+@media(max-width:900px){
+  .sd-frame{display:none}
+  .sd-col{left:calc(var(--i) * 25%);width:calc(25% + 2px);height:calc(6vh + var(--i) * 6vh)}
+  .sd-accent{height:18px}.sd-block{top:18px}
+  .stage-divider:not(.is-flipped) .sd-col:nth-child(n+5),.stage-divider.is-flipped .sd-col:nth-child(-n+2){display:none}
+
+  .stage-hero{
+    height:100vh!important;
+    height:100svh!important;
+    height:100dvh!important;
+    min-height:100vh!important;
+    min-height:100svh!important;
+    min-height:100dvh!important;
+    max-height:none!important;
+    padding-top:clamp(95px, 12vh, 120px)!important;
+    padding-bottom:clamp(45px, 7vh, 65px)!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+    box-sizing:border-box!important;
+  }
+  .stage-hero .video-toggle{
+    bottom:clamp(45px, 7vh, 65px)!important;
+  }
+}
 
 /* Loading cover and page-change curtain: plain black */
 .gs-preloader{background:#000!important}
@@ -373,8 +404,13 @@
 .dimensional-reel .reel-controls{bottom:clamp(100px,11vw,160px)!important}
 .dimensional-reel .reel-stage{top:46%!important}
 .dimensional-reel .reel-instruction{display:none}
-/* Seal the hairline where neighbouring columns meet. */
-.sd-accent,.sd-block{left:-1px;right:-1px}
 
 /* Hero pause control sits on the bottom row, clear of the seam zone */
 .stage-hero .video-toggle{bottom:calc(clamp(110px,12vw,170px) + 4px)}
+/* Client stories quote: animations wait until the section is in view. */
+.rx-quotes.is-armed:not(.is-in) .rx-quote blockquote span>span,.rx-quotes.is-armed:not(.is-in) .rx-quote figcaption,.rx-quotes.is-armed:not(.is-in) .rx-quote-nav i{animation-play-state:paused}
+
+/* Homepage reel: link through to every project */
+.dimensional-reel .reel-more{position:absolute;z-index:3;left:50%;bottom:clamp(36px,4.5vw,72px);transform:translateX(-50%);display:inline-flex;align-items:center;gap:18px;padding:13px 22px;border:1px solid rgba(237,243,239,.35);border-radius:100px;color:#edf3ef;font-size:14px;white-space:nowrap;transition:background-color .3s,color .3s,border-color .3s}
+.dimensional-reel .reel-more:hover{background:#edf3ef;color:#104850;border-color:#edf3ef}
+.dimensional-reel .reel-more:focus-visible{outline:2px solid #9fc9c4;outline-offset:3px}

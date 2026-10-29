@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const empty = { title: '', slug: '', category: '', excerpt: '', content: '', tags: '', image: '', published: true };
@@ -25,6 +25,9 @@ export default function AdminClient() {
   const [form, setForm] = useState(null);
   const [footer, setFooter] = useState(null);
   const [message, setMessage] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef(null);
   const router = useRouter();
 
   const load = async () => {
@@ -39,10 +42,16 @@ export default function AdminClient() {
   useEffect(() => {
     setForm(null);
     setMessage('');
+    setUploadError('');
+    setUploading(false);
     load();
   }, [tab]);
 
   const save = async () => {
+    if (uploading) {
+      setUploadError('Please wait for image upload to complete.');
+      return;
+    }
     const response = await fetch(`/api/content/${tab}${form.id ? `/${form.id}` : ''}`, {
       method: form.id ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -51,7 +60,7 @@ export default function AdminClient() {
     const data = await response.json();
     if (!response.ok) return setMessage(data.error || 'Unable to save');
     setForm(null);
-    setMessage(tab === 'works' ? 'Work saved and published to the website.' : 'Post saved.');
+    setMessage(tab === 'works' ? 'Work saved successfully.' : 'Post saved.');
     load();
   };
 
@@ -65,16 +74,31 @@ export default function AdminClient() {
 
   const upload = async event => {
     const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) return;
-    const data = new FormData();
-    data.append('file', file);
-    setMessage('Uploading…');
-    const response = await fetch('/api/upload', { method: 'POST', body: data });
-    const result = await response.json();
-    if (result.url) {
-      setForm(current => ({ ...current, image: result.url }));
-      setMessage('Image uploaded.');
-    } else setMessage(result.error || 'Upload failed');
+
+    // Immediately display local preview so user sees new image instantly
+    const localUrl = URL.createObjectURL(file);
+    setForm(current => ({ ...current, image: localUrl }));
+    setUploading(true);
+    setUploadError('');
+
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      const response = await fetch('/api/upload', { method: 'POST', body: data });
+      const result = await response.json();
+      if (response.ok && result.url) {
+        setForm(current => ({ ...current, image: result.url }));
+        setUploadError('');
+      } else {
+        setUploadError(result.error || 'Upload to cloud failed. The local preview is shown, but please try uploading again.');
+      }
+    } catch (err) {
+      setUploadError('Upload failed: ' + (err.message || 'Network error'));
+    } finally {
+      setUploading(false);
+    }
   };
 
   const saveFooter = async () => {
@@ -102,14 +126,18 @@ export default function AdminClient() {
     location.href = '/admin/login';
   };
 
-  const edit = row => setForm({
-    ...row,
-    tags: Array.isArray(row.tags) ? row.tags.join(', ') : (row.tags || ''),
-  });
+  const edit = row => {
+    setUploadError('');
+    setUploading(false);
+    setForm({
+      ...row,
+      tags: Array.isArray(row.tags) ? row.tags.join(', ') : (row.tags || ''),
+    });
+  };
 
   const publicPath = row => `/${tab === 'works' ? 'work' : 'blog'}/${row.slug}`;
 
-  return <main className="sec top adm"><div className="wrap">
+  return <main id="main-content" className="sec top adm"><div className="wrap">
     <div className="row between"><h1 className="h2" style={{ fontSize: 40 }}>Admin</h1><button className="btn ghost sm" onClick={logOut}>Log out</button></div>
     <div className="tabs">
       {[['works', 'Work'], ['posts', 'Blog posts'], ['contacts', 'Contact submissions'], ['footer', 'Footer']].map(([key, label]) =>
@@ -150,7 +178,7 @@ export default function AdminClient() {
     {!['footer', 'contacts'].includes(tab) && !form && <>
       <button className="btn sm" onClick={() => setForm({ ...empty })}>+ Add new {tab === 'works' ? 'work' : 'post'}</button>
       <div className="list">
-        {rows.map(row => <div key={row.id} className="item"><div><b>{row.title}</b><small className="mut"> {publicPath(row)}{row.published ? '' : ' (draft)'}</small></div>
+        {rows.map(row => <div key={row.id} className="item"><div><b>{row.title}</b><small className="mut"> {publicPath(row)}</small></div>
           <div className="row"><a className="btn ghost sm" href={publicPath(row)} target="_blank" rel="noreferrer">View</a><button className="btn ghost sm" onClick={() => edit(row)}>Edit</button><button className="btn ghost sm" onClick={() => remove(row.id)}>Delete</button></div>
         </div>)}
         {!rows.length && <p className="mut">Nothing here yet.</p>}
@@ -164,10 +192,107 @@ export default function AdminClient() {
       <label>Short summary<input value={form.excerpt} onChange={event => setForm({ ...form, excerpt: event.target.value })} /></label>
       <label>Detailed content <small className="mut">Use a blank line for a new paragraph. Start a heading with ## followed by a space.</small><textarea rows={14} placeholder={'Project introduction.\n\n## The challenge\n\nDescribe the challenge here.'} value={form.content} onChange={event => setForm({ ...form, content: event.target.value })} /></label>
       {tab === 'works' && <label>Tags (comma separated)<input placeholder="Website, UI/UX, E-commerce" value={form.tags || ''} onChange={event => setForm({ ...form, tags: event.target.value })} /></label>}
-      <label>Cover image<input type="file" accept="image/*" onChange={upload} /></label>
-      {form.image && <img src={form.image} alt="" style={{ maxWidth: 260, borderRadius: 12 }} />}
-      <label className="row"><input type="checkbox" checked={form.published} onChange={event => setForm({ ...form, published: event.target.checked })} style={{ width: 'auto' }} /> Published</label>
-      <div className="row"><button className="btn" onClick={save}>Save {tab === 'works' ? 'work' : 'post'}</button><button className="btn ghost" onClick={() => setForm(null)}>Cancel</button></div>
+      <div>
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>Cover image</label>
+        {form.image ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <img
+                src={form.image}
+                alt="Cover preview"
+                style={{
+                  maxWidth: 320,
+                  maxHeight: 200,
+                  width: 'auto',
+                  height: 'auto',
+                  objectFit: 'cover',
+                  borderRadius: 10,
+                  border: '1px solid var(--line)',
+                  display: 'block'
+                }}
+              />
+              {uploading && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.65)',
+                  borderRadius: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontSize: 13,
+                  fontWeight: 500
+                }}>
+                  Uploading to cloud…
+                </div>
+              )}
+            </div>
+            <div className="row" style={{ gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn ghost sm"
+                disabled={uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploading ? 'Uploading…' : 'Change image'}
+              </button>
+              <button
+                type="button"
+                className="btn ghost sm"
+                disabled={uploading}
+                onClick={() => {
+                  setForm(current => ({ ...current, image: '' }));
+                  setUploadError('');
+                }}
+              >
+                Delete image
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start' }}>
+            <button
+              type="button"
+              className="btn ghost sm"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? 'Uploading…' : '+ Upload cover image'}
+            </button>
+          </div>
+        )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={upload}
+          style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}
+        />
+
+        <div style={{ marginTop: 10 }}>
+          <label style={{ fontSize: 13, color: 'var(--mut)', display: 'block', marginBottom: 4 }}>
+            Or image path / URL:
+          </label>
+          <input
+            placeholder="/projects/circuit-india.webp or https://..."
+            value={form.image || ''}
+            onChange={event => setForm({ ...form, image: event.target.value })}
+            style={{ fontSize: 14, padding: '10px 14px' }}
+          />
+        </div>
+
+        {uploadError && <p style={{ color: '#e5534b', fontSize: 13, margin: '8px 0 0' }}>{uploadError}</p>}
+      </div>
+      <div className="row">
+        <button className="btn" disabled={uploading} onClick={save}>
+          {uploading ? 'Uploading image…' : `Save ${tab === 'works' ? 'work' : 'post'}`}
+        </button>
+        <button className="btn ghost" disabled={uploading} onClick={() => setForm(null)}>
+          Cancel
+        </button>
+      </div>
     </div>}
   </div></main>;
 }

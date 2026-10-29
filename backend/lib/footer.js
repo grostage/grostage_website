@@ -5,7 +5,7 @@ export const defaultFooter = {
   links: [
     { label: 'About Us', value: '/about' }, { label: 'Services', value: '/services' },
     { label: 'Our Work', value: '/work' }, { label: 'Blog', value: '/blog' },
-    { label: 'Client Stories', value: '/client-stories' }, { label: 'Contact', value: '/contact' },
+    { label: 'Client Stories', value: '/client-stories' }, { label: 'Clients', value: '/clients' }, { label: 'Contact', value: '/contact' },
   ],
   socials: [
     { label: 'LinkedIn', value: 'https://linkedin.com/company/grostage' },

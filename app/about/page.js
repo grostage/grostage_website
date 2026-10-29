@@ -3,7 +3,17 @@ import StageDivider from '@/frontend/components/StageDivider';
 import CTA from '@/frontend/components/CTA';
 import { VisionMission, ProcessStepper, Team } from '@/frontend/components/AboutSections';
 import { steps } from '@/backend/lib/content';
-export const metadata = { title: 'About Us — Grostage' };
+export const metadata = {
+  title: 'About Us — Grostage',
+  description: 'Meet the Grostage team. One collective bringing together strategy, design, technology and AI to build what businesses need next.',
+  openGraph: {
+    title: 'About Us — Grostage',
+    description: 'Meet the Grostage team. One collective bringing together strategy, design, technology and AI to build what businesses need next.',
+    url: 'https://grostage.com/about',
+    images: [{ url: '/projects/profile-8-0.jpeg', width: 1200, height: 630, alt: 'About Grostage' }],
+  },
+  alternates: { canonical: 'https://grostage.com/about' },
+};
 const people = [['Sanal P K', 'Founder & CEO', 'Business strategy, product direction and growth.'], ['Pranav', 'Chief Business Officer', 'Strategic relationships, partnerships and expansion.'], ['Vishnu', 'Head of Operations', 'Project coordination, delivery and client collaboration.'], ['Hari', 'Technical Officer', 'Software development, engineering and technical execution.']];
 export default function About() {
   return <main id="main-content">

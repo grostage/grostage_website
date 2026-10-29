@@ -13,7 +13,18 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const work = await getWork(slug);
-  return { title: work ? `${work.title} — Grostage` : 'Project not found — Grostage' };
+  if (!work) return { title: 'Project not found — Grostage' };
+  return {
+    title: `${work.title} — Grostage`,
+    description: work.excerpt || `Discover how Grostage built ${work.title}: ${work.category}.`,
+    openGraph: {
+      title: `${work.title} — Grostage`,
+      description: work.excerpt || `Discover how Grostage built ${work.title}: ${work.category}.`,
+      url: `https://grostage.com/work/${slug}`,
+      images: work.image ? [{ url: work.image, width: 1200, height: 630, alt: work.title }] : [],
+    },
+    alternates: { canonical: `https://grostage.com/work/${slug}` },
+  };
 }
 
 export default async function WorkDetail({ params }) {

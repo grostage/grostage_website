@@ -4,3 +4,4 @@ node_modules
 .next-dev
 .env
 .env.local
+.taste-skill/

@@ -1,64 +1,42 @@
 'use client';
 import { useRef } from 'react';
-import { gsap, ScrollTrigger, useGSAP } from '@/frontend/lib/gsap';
+import { gsap, useGSAP } from '@/frontend/lib/gsap';
 
-// Stepped block wipe that straddles the seam between two sections.
-// The zone spans the empty space after the previous section's last content and
-// before the next section's first content, so nothing is ever covered and no
-// height is added. Inside it, the previous colour hangs down into the next
-// section, then wide blocks of the next colour (led by a brand-colour band)
-// climb through the zone, each at its own pace, joining the two sections.
-const COLS = 5;
-// Start offsets per column (0 = first to move); gives the staircase silhouette.
-const LAG = [.18, 0, .32, .5, .66];
-const CONTENT = 'h1,h2,h3,h4,p,a,button,img,video,figure,blockquote,li,dt,dd,input,textarea,label';
-
-// Distance between a section edge and its nearest real content.
-function emptySpace(node, side) {
-  if (!node) return 0;
-  const section = node.classList.contains('pin-spacer') ? node.firstElementChild : node;
-  if (!section) return 0;
-  const box = section.getBoundingClientRect();
-  if (!box.height) return 0;
-  let edge = side === 'bottom' ? box.top : box.bottom;
-  for (const el of section.querySelectorAll(CONTENT)) {
-    const hidden = el.closest('[aria-hidden="true"]');
-    if (hidden && !hidden.classList.contains('rx-ticker')) continue; // decorative layers
-    if (el.closest('[inert]')) continue; // collapsed panels
-    const r = el.getBoundingClientRect();
-    if (!r.width || !r.height || (r.height > box.height * .85 && r.width > box.width * .9)) continue; // full-bleed backgrounds
-    edge = side === 'bottom' ? Math.max(edge, r.bottom) : Math.min(edge, r.top);
-  }
-  const gap = side === 'bottom' ? box.bottom - edge : edge - box.top;
-  return Math.round(Math.max(0, Math.min(gap - 24, innerHeight * .45)));
-}
-
+// A staircase of the next section's colour climbs over the outgoing one while a frame
+// of the accent colour closes in around it, so the two read as one continuous surface.
 export default function StageDivider({ from = '#060908', to = '#f0f3ef', accent = '#104850', flip = false }) {
   const root = useRef(null);
+  const cols = 6;
+
   useGSAP(() => {
+    const el = root.current;
+    if (!el) return;
     const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const el = root.current;
-      const measure = () => {
-        el.style.setProperty('--sd-up', emptySpace(el.previousElementSibling, 'bottom') + 'px');
-        el.style.setProperty('--sd-down', emptySpace(el.nextElementSibling, 'top') + 'px');
-      };
-      measure();
-      el.classList.add('is-armed');
-      ScrollTrigger.addEventListener('refreshInit', measure);
-      const cols = el.querySelectorAll('.sd-col');
-      const tl = gsap.timeline({ scrollTrigger: { trigger: cols[0], start: 'top 92%', end: 'bottom 40%', scrub: .4, invalidateOnRefresh: true } });
-      cols.forEach((col, i) => {
-        const lag = LAG[flip ? COLS - 1 - i : i];
-        const [accentBlock, block] = col.children;
-        tl.fromTo(accentBlock, { yPercent: 100 }, { yPercent: 0, ease: 'none', duration: 1 }, lag * .8)
-          .fromTo(block, { yPercent: 100 }, { yPercent: 0, ease: 'none', duration: 1 }, lag * .8 + .24);
+    mm.add({ phone: '(max-width: 900px)', motion: '(prefers-reduced-motion: no-preference)' }, ctx => {
+      const { phone, motion } = ctx.conditions;
+      const steps = [...el.querySelectorAll('.sd-col')].filter(c => getComputedStyle(c).display !== 'none');
+      const frame = el.querySelector('.sd-frame');
+      if (!motion) { gsap.set(el.querySelectorAll('.sd-block-wrap'), { y: 0, yPercent: 0 }); return; }
+      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: phone ? 'top bottom' : 'top bottom+=10%', end: phone ? 'top 45%' : 'top 25%', scrub: .35, invalidateOnRefresh: true } });
+      // The frame closes in first, then the stairs climb one after another.
+      // Phones skip the frame: on a narrow screen it reads as a border around the page.
+      if (!phone) tl.fromTo(frame, { '--sd-edge': '0px' }, { '--sd-edge': Math.round(Math.min(24, Math.max(14, innerWidth * .014))) + 'px', ease: 'none', duration: .45 }, 0);
+      steps.forEach(col => {
+        // The tallest step leads, so the staircase climbs toward its high side.
+        const rank = steps.map(c => +c.style.getPropertyValue('--i')), i = +col.style.getPropertyValue('--i');
+        const order = Math.max(...rank) - i;
+        tl.fromTo(col.querySelector('.sd-block-wrap'), { y: 0, yPercent: 101 }, { y: 0, yPercent: 0, ease: 'power1.inOut', duration: .5 }, .12 + order * (.38 / steps.length));
       });
-      return () => { ScrollTrigger.removeEventListener('refreshInit', measure); el.classList.remove('is-armed'); };
     });
     return () => mm.revert();
-  }, { scope: root });
-  return <div ref={root} className="stage-divider" style={{ '--sd-from': from, '--sd-to': to, '--sd-accent': accent }} aria-hidden="true">
-    {Array.from({ length: COLS }, (_, i) => <span className="sd-col" key={i}><i className="sd-accent" /><i className="sd-block" /></span>)}
+  }, { scope: root, dependencies: [flip] });
+
+  return <div ref={root} className={`stage-divider${flip ? ' is-flipped' : ''}`} style={{ '--sd-from': from, '--sd-to': to, '--sd-accent': accent }} aria-hidden="true">
+    <i className="sd-frame" />
+    <div className="sd-cols">
+      {Array.from({ length: cols }, (_, i) => <span className="sd-col" key={i} style={{ '--i': flip ? cols - 1 - i : i }}>
+        <span className="sd-block-wrap"><i className="sd-accent" /><i className="sd-block" /></span>
+      </span>)}
+    </div>
   </div>;
 }

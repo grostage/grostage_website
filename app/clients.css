@@ -1,0 +1,219 @@
+/* ===== OUR CLIENTS ===== */
+.cl-page {
+  background: #f0f3ef;
+}
+.cl-head {
+  padding: 190px max(6vw, 24px) 70px;
+  text-align: center;
+  color: #104850;
+  background: #f0f3ef;
+}
+.cl-head h1 {
+  margin: 0;
+  font-size: clamp(56px, 8vw, 120px);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  font-weight: 450;
+}
+.cl-head p {
+  margin: 28px auto 0;
+  max-width: 36em;
+  font-size: 19px;
+  line-height: 1.6;
+  color: #104850;
+}
+.cl-head a {
+  color: #104850;
+  text-decoration: underline;
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.22em;
+  transition: color 0.25s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cl-head a:hover {
+    color: #1b8a99;
+  }
+}
+
+.cl-wall {
+  padding: 0 max(6vw, 24px) 150px;
+  background: #f0f3ef;
+}
+.cl-wall ul {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 1400px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.cl-tile {
+  position: relative;
+  aspect-ratio: 1.18;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  padding: 28px 20px 22px;
+  background: #e3ece7;
+  color: #104850;
+  border-radius: 8px;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hover flood curtain animation */
+.cl-tile:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #104850;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cl-logo-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+.cl-logo-wrap img {
+  max-width: 82%;
+  max-height: 66px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  /* Grayscale by default on desktop */
+  filter: grayscale(1) opacity(0.72) contrast(1.1);
+  transition: filter 0.4s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cl-word {
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-weight: 600;
+  color: #104850;
+  transition: color 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cl-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding-top: 10px;
+}
+.cl-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: #104850;
+  line-height: 1.25;
+  transition: color 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cl-industry {
+  font-size: 12px;
+  color: #3f6b70;
+  line-height: 1.3;
+  opacity: 0.85;
+  transition: color 0.35s ease, opacity 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Desktop Hover: Keep teal curtain flood, lift, and bring original colors back */
+@media (hover: hover) and (pointer: fine) {
+  .cl-tile:hover {
+    color: #edf3ef;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(16, 72, 80, 0.45);
+  }
+  .cl-tile:hover:before {
+    transform: scaleY(1);
+  }
+  .cl-tile:hover .cl-logo-wrap img {
+    filter: none;
+    transform: translateY(-6px) scale(1.06);
+  }
+  .cl-tile:hover .cl-word {
+    color: #edf3ef;
+    transform: translateY(-6px) scale(1.05);
+  }
+  .cl-tile:hover .cl-name {
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+  .cl-tile:hover .cl-industry {
+    color: #a0ceca;
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+/* Medium screens (tablets) */
+@media (max-width: 1080px) {
+  .cl-wall ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Smaller screens (tablets & phones): logos have full color by default */
+@media (max-width: 900px), (hover: none) {
+  .cl-logo-wrap img {
+    /* Full original brand colors by default on smaller screens */
+    filter: grayscale(0) opacity(1) !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .cl-head {
+    padding: 140px 16px 50px;
+  }
+  .cl-head h1 {
+    font-size: clamp(40px, 12vw, 64px);
+  }
+  .cl-head p {
+    font-size: 16px;
+  }
+  .cl-wall {
+    padding: 0 16px 90px;
+  }
+  .cl-wall ul {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .cl-tile {
+    aspect-ratio: auto;
+    min-height: 170px;
+    padding: 18px 12px 14px;
+  }
+  .cl-logo-wrap img {
+    max-height: 48px;
+  }
+  .cl-name {
+    font-size: 13px;
+  }
+  .cl-industry {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-tile,
+  .cl-tile:before,
+  .cl-tile img,
+  .cl-word,
+  .cl-name,
+  .cl-industry {
+    transition: none !important;
+    transform: none !important;
+  }
+}

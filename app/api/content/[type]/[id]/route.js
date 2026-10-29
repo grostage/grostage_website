@@ -6,16 +6,15 @@ export async function PUT(req, { params }) {
   const { type, id } = await params; if (!ok(type) || !(await isAdmin())) return Response.json({}, { status: 401 });
   const b = await req.json().catch(() => ({}));
   if (!String(b.title || '').trim()) return Response.json({ error: 'Title is required' }, { status: 400 });
-  if (type === 'works' && b.published !== false && !String(b.image || '').trim()) return Response.json({ error: 'A cover image is required before publishing this work.' }, { status: 400 });
   try {
     if (type === 'works') {
       await ensureWorksTable();
       const tags = Array.isArray(b.tags) ? b.tags.join(', ') : String(b.tags || '');
-      const r = await q(`UPDATE works SET title=$1,slug=$2,category=$3,excerpt=$4,content=$5,image=$6,tags=$7,published=$8 WHERE id=$9 RETURNING *`, [b.title, slugify(b.slug || b.title), b.category || '', b.excerpt || '', b.content || '', b.image || '', tags, b.published !== false, id]);
+      const r = await q(`UPDATE works SET title=$1,slug=$2,category=$3,excerpt=$4,content=$5,image=$6,tags=$7,published=true WHERE id=$8 RETURNING *`, [b.title, slugify(b.slug || b.title), b.category || '', b.excerpt || '', b.content || '', b.image || '', tags, id]);
       if (!r.length) return Response.json({ error: 'Work not found' }, { status: 404 });
       return Response.json(r[0]);
     }
-    const r = await q(`UPDATE ${type} SET title=$1,slug=$2,excerpt=$3,content=$4,image=$5,published=$6 WHERE id=$7 RETURNING *`, [b.title, slugify(b.slug || b.title), b.excerpt || '', b.content || '', b.image || '', b.published !== false, id]);
+    const r = await q(`UPDATE ${type} SET title=$1,slug=$2,excerpt=$3,content=$4,image=$5,published=true WHERE id=$6 RETURNING *`, [b.title, slugify(b.slug || b.title), b.excerpt || '', b.content || '', b.image || '', id]);
     return Response.json(r[0]);
   } catch (e) { console.error('Content update failed', e); return Response.json({ error: 'Content could not be saved. Check the database connection.' }, { status: 503 }); }
 }

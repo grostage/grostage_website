@@ -8,13 +8,13 @@ export default function Template({ children }) {
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const root = ref.current;
-      const headings = [...root.querySelectorAll('h1,h2')].filter(n => !n.closest('.cinematic-home,.experience-hero,.reel-section,.studio-showcase,.adm,.rx-intro,.rx-cta,.rx,.cs'));
+      const headings = [...root.querySelectorAll('h1,h2')].filter(n => !n.closest('.wk-page,.td,.cinematic-home,.experience-hero,.reel-section,.studio-showcase,.adm,.rx-intro,.rx-cta,.rx,.cs'));
       const splits = headings.map(heading => SplitText.create(heading, {
         type: 'lines', mask: 'lines', linesClass: 'interactive-line', autoSplit: true,
         onSplit(self) { return gsap.from(self.lines, { yPercent: 105, opacity: .2, stagger: .07, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: heading, start: 'top 95%', once: true } }); }
       }));
       const els = [...root.querySelectorAll('h1,h2,h3,blockquote,main p,.about-feature>img,.work-cover,.article-cover')]
-        .filter(n => !n.closest('.cform,.cinematic-home,.adm,.hero,.reveal,.reel-section,.hx,.studio-showcase,.experience-hero,.svx,.rx,.rx-intro,.rx-cta,.cs') && !n.matches('h1,h2,.intro-fill'));
+        .filter(n => !n.closest('.wk-page,.td,.cform,.cinematic-home,.adm,.hero,.reveal,.reel-section,.hx,.studio-showcase,.experience-hero,.svx,.rx,.rx-intro,.rx-cta,.cs') && !n.matches('h1,h2,.intro-fill'));
       gsap.set(els, { autoAlpha: 0, y: 24 });
       ScrollTrigger.batch(els, { start: 'top 92%', once: true,
         onEnter: b => gsap.to(b, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.08, ease: 'power3.out', overwrite: true }) });
