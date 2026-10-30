@@ -1,0 +1,133 @@
+/* Marketing Section 03: fully scoped; does not override Services, homepage or Section 02. */
+.marketing-services-page .marketing-service-explorer {
+  --marketing-handoff-reveal: 100%;
+  position: relative;
+  isolation: isolate;
+  padding: clamp(72px, 7vw, 112px) 0 clamp(105px, 11vw, 168px);
+  background: #090f10;
+  color: #101918;
+  overflow: clip;
+}
+.marketing-services-page .marketing-service-explorer::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: #f0f3ef;
+  clip-path: inset(0 0 calc(100% - var(--marketing-handoff-reveal)) 0);
+  pointer-events: none;
+}
+.marketing-services-page .ms3-shell { position: relative; z-index: 1; width: min(100% - 12.6vw, 1480px); margin: 0 auto; }
+.marketing-services-page .ms3-heading { max-width: 900px; margin-bottom: clamp(40px, 5vw, 76px); }
+.marketing-services-page .ms3-index { margin: 0 0 32px; font-size: 11px; font-weight: 500; letter-spacing: .2em; color: #4b6560; }
+.marketing-services-page .ms3-heading h2 {
+  margin: 0; font-size: clamp(48px, 6.3vw, 100px); line-height: .99;
+  font-weight: 590; letter-spacing: -.061em; max-width: 990px;
+}
+.marketing-services-page .ms3-heading h2 > span { display: block; color: #183d3b; }
+.marketing-services-page .ms3-intro { max-width: 565px; margin: 24px 0 0; color: #566864; font-size: clamp(15px, 1.2vw, 18px); line-height: 1.56; }
+.marketing-services-page .ms3-services-grid { display: grid; grid-template-columns: minmax(0, .96fr) minmax(0, 1.43fr); gap: clamp(30px, 4vw, 66px); align-items: stretch; }
+.marketing-services-page .ms3-list { min-width: 0; border-top: 2px solid #cbd4d0; }
+.marketing-services-page .ms3-service-item { border-bottom: 1px solid #cbd4d0; position: relative; background: transparent; transition: background-color .6s cubic-bezier(.22,1,.36,1); }
+.marketing-services-page .ms3-service-item.is-active { background: #dfe7e2; border-radius: 12px; }
+.marketing-services-page .ms3-service-trigger {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) 26px; gap: 12px;
+  align-items: center; width: 100%; min-height: 88px; padding: 18px 17px;
+  border: 0; background: transparent; text-align: left; color: #14211f; cursor: pointer;
+  font-family: inherit;
+}
+.marketing-services-page .ms3-number { color: #64736f; font-size: 13px; font-weight: 450; }
+.marketing-services-page .ms3-name { font-size: clamp(20px, 1.68vw, 29px); letter-spacing: -.044em; font-weight: 600; line-height: 1.14; transition: color .25s ease, transform .35s ease; }
+.marketing-services-page .ms3-service-item:not(.is-active) .ms3-name { color: #303c39; }
+.marketing-services-page .ms3-service-trigger:hover .ms3-name,
+.marketing-services-page .ms3-service-trigger:focus-visible .ms3-name { color: #104850; transform: translateX(3px); }
+.marketing-services-page .ms3-toggle { position: relative; justify-self: end; width: 26px; height: 27px; font-size: 27px; font-weight: 350; line-height: 1; }
+.marketing-services-page .ms3-toggle-symbol { display: grid; width: 100%; height: 100%; place-items: center; }
+.marketing-services-page .ms3-toggle-symbol > span { grid-area: 1 / 1; display: block; transition: opacity .35s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+.marketing-services-page .ms3-toggle-symbol > span:last-child { opacity: 0; transform: rotate(-90deg); }
+.marketing-services-page .ms3-toggle-symbol.is-open > span:first-child { opacity: 0; transform: rotate(90deg); }
+.marketing-services-page .ms3-toggle-symbol.is-open > span:last-child { opacity: 1; transform: rotate(0); }
+.marketing-services-page .ms3-service-trigger:focus-visible { outline: 2px solid #104850; outline-offset: -3px; border-radius: 8px; }
+.marketing-services-page .ms3-service-disclosure { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .6s cubic-bezier(.22,1,.36,1); }
+.marketing-services-page .ms3-service-disclosure.is-open { grid-template-rows: 1fr; }
+.marketing-services-page .ms3-service-disclosure-inner { min-height: 0; overflow: hidden; }
+.marketing-services-page .ms3-service-details { padding: 0 18px 27px 67px; }
+.marketing-services-page .ms3-service-details > p { color: #435450; font-size: clamp(14px, 1.02vw, 16px); line-height: 1.55; margin: 0 0 18px; max-width: 460px; opacity: 0; transform: translateY(12px); transition: opacity .4s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+.marketing-services-page .ms3-service-disclosure.is-open .ms3-service-details > p { opacity: 1; transform: translateY(0); transition-delay: .06s; }
+.marketing-services-page .ms3-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; }
+.marketing-services-page .ms3-tags li { border: 1px solid #c7d1cc; color: #253a36; font-size: 11px; font-weight: 500; border-radius: 60px; padding: 8px 11px; background: #edf1ee; line-height: 1.1; opacity: 0; transform: translateY(9px); transition: opacity .4s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+.marketing-services-page .ms3-service-disclosure.is-open .ms3-tags li { opacity: 1; transform: translateY(0); }
+.marketing-services-page .ms3-service-disclosure.is-open .ms3-tags li:nth-child(1) { transition-delay: .12s; }
+.marketing-services-page .ms3-service-disclosure.is-open .ms3-tags li:nth-child(2) { transition-delay: .18s; }
+.marketing-services-page .ms3-service-disclosure.is-open .ms3-tags li:nth-child(3) { transition-delay: .24s; }
+.marketing-services-page .ms3-service-disclosure.is-open .ms3-tags li:nth-child(4) { transition-delay: .30s; }
+.marketing-services-page .ms3-preview-column { position: relative; min-width: 0; perspective: 1300px; }
+.marketing-services-page .ms3-preview-card {
+  position: absolute; inset: 0 0 auto; isolation: isolate; width: 100%; height: 100%;
+  aspect-ratio: auto; min-height: 0; background: #0a1010; border-radius: 22px; overflow: hidden;
+  color: #f0f3ef; transform-style: preserve-3d;
+  box-shadow: 0 35px 80px -50px #0e1a1870;
+}
+.marketing-services-page .ms3-scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .46s ease, visibility .46s; pointer-events: none; }
+.marketing-services-page .ms3-scene.is-active { opacity: 1; visibility: visible; z-index: 2; }
+.marketing-services-page .ms3-scene-image { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+.marketing-services-page .ms3-scene-image img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; }
+.marketing-services-page .ms3-scene-shade { position: absolute; inset: 0; background: linear-gradient(180deg, #0508087d 0%, transparent 24%, transparent 45%, #040908ee 100%); }
+.marketing-services-page .ms3-preview-top { position: absolute; top: clamp(22px, 3.5vw, 45px); left: clamp(22px, 3.5vw, 45px); right: clamp(22px, 3.5vw, 45px); display: flex; justify-content: space-between; gap: 20px; color: #d7dcd8; font-size: 10px; font-weight: 500; line-height: 1.7; letter-spacing: .16em; }
+.marketing-services-page .ms3-preview-top span:last-child { text-align: right; }
+.marketing-services-page .ms3-preview-bottom { position: absolute; left: clamp(22px, 3.5vw, 45px); right: clamp(22px, 3.5vw, 45px); bottom: clamp(24px, 3.5vw, 48px); display: flex; align-items: end; justify-content: space-between; gap: 25px; }
+.marketing-services-page .ms3-preview-kicker { font-size: 10px; letter-spacing: .16em; color: #d0d7d1; }
+.marketing-services-page .ms3-preview-title { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(27px, 2.9vw, 46px); max-width: 490px; margin: 12px 0 0; line-height: 1.08; letter-spacing: -.036em; font-weight: 400; color: #f8f8f4; }
+.marketing-services-page .ms3-preview-detail { font-size: clamp(11px, .95vw, 14px); line-height: 1.5; max-width: 210px; color: #b9c4bf; margin: 0; }
+.marketing-services-page .ms3-preview-glare { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; background: radial-gradient(circle 180px at var(--ms3-mx,50%) var(--ms3-my,50%),#f0f3ef13,transparent 75%); transition: opacity .35s; }
+.marketing-services-page .ms3-preview-card:hover .ms3-preview-glare { opacity: 1; }
+.marketing-services-page .ms3-preview-foot { position: absolute; top: 100%; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 15px 4px 0; font-size: 11px; color: #657770; }
+.marketing-services-page .ms3-preview-foot a { color: #104850; border-bottom: 1px solid #1048507a; text-decoration: none; padding-bottom: 5px; font-weight: 550; white-space: nowrap; }
+.marketing-services-page .ms3-preview-foot a > span { display: inline-block; transition: transform .3s; margin-left: 7px; }
+.marketing-services-page .ms3-preview-foot a:hover > span { transform: translate(3px,-3px); }
+.marketing-services-page .ms3-preview-foot a:focus-visible { outline: 2px solid #104850; outline-offset: 4px; }
+.marketing-services-page .ms3-mobile-visual { display: none; }
+@media (max-width: 1100px) {
+  .marketing-services-page .ms3-shell { width: calc(100% - 10vw); }
+  .marketing-services-page .ms3-service-trigger { min-height: 78px; }
+  .marketing-services-page .ms3-name { font-size: clamp(19px, 2.05vw, 26px); }
+  .marketing-services-page .ms3-service-details { padding-left: 61px; }
+}
+@media (max-width: 900px) {
+  .marketing-services-page .marketing-service-explorer { padding-block: 90px 105px; }
+  .marketing-services-page .ms3-shell { width: calc(100% - 12vw); }
+  .marketing-services-page .ms3-services-grid { display: block; }
+  .marketing-services-page .ms3-heading { margin-bottom: 40px; }
+  .marketing-services-page .ms3-heading h2 { font-size: clamp(44px, 8.6vw, 70px); }
+  .marketing-services-page .ms3-preview-column { display: none; }
+  .marketing-services-page .ms3-name { font-size: 25px; }
+  .marketing-services-page .ms3-mobile-visual { display: block; margin-top: 24px; background: #091110; overflow: hidden; border-radius: 14px; }
+  .marketing-services-page .ms3-mobile-visual img { display: block; width: 100%; aspect-ratio: 1.6; object-fit: cover; }
+  .marketing-services-page .ms3-mobile-visual span { display: block; padding: 10px 15px 12px; font-size: 10px; color: #c5d0c8; letter-spacing: .06em; }
+}
+@media (max-width: 600px) {
+  .marketing-services-page .marketing-service-explorer { padding-block: 72px 90px; }
+  .marketing-services-page .ms3-shell { width: calc(100% - 48px); }
+  .marketing-services-page .ms3-index { font-size: 9px; margin-bottom: 24px; }
+  .marketing-services-page .ms3-heading h2 { font-size: clamp(38px, 10.5vw, 58px); letter-spacing: -.055em; }
+  .marketing-services-page .ms3-intro { font-size: 14px; margin-top: 18px; }
+  .marketing-services-page .ms3-service-trigger { min-height: 72px; grid-template-columns: 29px minmax(0,1fr) 22px; gap: 7px; padding-inline: 10px; }
+  .marketing-services-page .ms3-number { font-size: 11px; }
+  .marketing-services-page .ms3-name { font-size: clamp(18px, 5vw, 22px); }
+  .marketing-services-page .ms3-service-details { padding: 0 12px 22px 45px; }
+  .marketing-services-page .ms3-service-details > p { font-size: 13px; }
+  .marketing-services-page .ms3-tags li { font-size: 10px; padding: 7px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marketing-services-page .marketing-service-explorer {
+    --marketing-handoff-reveal: 100% !important;
+  }
+  .marketing-services-page .ms3-service-item,
+  .marketing-services-page .ms3-name,
+  .marketing-services-page .ms3-toggle-symbol > span,
+  .marketing-services-page .ms3-service-disclosure,
+  .marketing-services-page .ms3-service-details > p,
+  .marketing-services-page .ms3-tags li,
+  .marketing-services-page .ms3-scene,
+  .marketing-services-page .ms3-preview-glare { transition: none; }
+}

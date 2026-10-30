@@ -1,0 +1,619 @@
+.marketing-services-page {
+  min-height: 100svh;
+  background: #090f10;
+  color: #f0f3ef;
+}
+
+.marketing-services-page .marketing-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: max(720px, 100svh);
+  overflow: hidden;
+  padding: 150px 6.3vw 90px;
+  background: #050505;
+  color: #f0f3ef;
+}
+
+.marketing-services-page .marketing-video-layer {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  background: #050505;
+  pointer-events: none;
+}
+
+.marketing-services-page .marketing-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 66% center;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.marketing-services-page .marketing-video:not([data-unavailable]) { opacity: 1; }
+
+.marketing-services-page .marketing-video-blend {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .12);
+}
+
+.marketing-services-page .marketing-hero-content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 1100px);
+  margin-top: 10px;
+}
+
+.marketing-services-page .marketing-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 clamp(42px, 5vw, 72px);
+  color: #c2dbd6;
+  font-size: 11px;
+  letter-spacing: .15em;
+}
+
+.marketing-services-page .marketing-eyebrow i {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #a9ceca;
+}
+
+.marketing-services-page .marketing-title {
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 48px;
+  font-size: clamp(64px, 8.1vw, 132px);
+  color: #f0f3ef;
+  font-weight: 300;
+  line-height: .89;
+  letter-spacing: -.025em;
+  text-shadow: 0 2px 24px #050a0bcc, 0 1px 3px #050a0b99;
+}
+
+.marketing-services-page .marketing-title-line {
+  display: block;
+  overflow: hidden;
+  padding: .06em .06em .12em 0;
+  margin: -.06em 0 -.12em;
+}
+
+.marketing-services-page .marketing-title-line > span { display: block; }
+
+.marketing-services-page .marketing-title-accent {
+  margin-left: clamp(18px, 5.7vw, 96px);
+  color: inherit;
+}
+
+.marketing-services-page .marketing-description {
+  max-width: 310px;
+  margin: 0;
+  color: #c4d3d0;
+  font-size: 14px;
+  line-height: 1.8;
+  text-shadow: 0 2px 24px #050a0bcc, 0 1px 3px #050a0b99;
+}
+
+.marketing-services-page .marketing-hero-actions {
+  position: absolute;
+  z-index: 2;
+  right: 6.3vw;
+  bottom: clamp(52px, 8vh, 92px);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.marketing-services-page .stage-scroll {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: #c4d3d0;
+  font-family: var(--inter), Arial, sans-serif;
+  cursor: pointer;
+}
+
+.marketing-services-page .stage-scroll:focus-visible {
+  outline: 2px solid #a9ceca;
+  outline-offset: 4px;
+}
+
+.marketing-services-page .marketing-video-toggle {
+  position: absolute;
+  z-index: 2;
+  left: 28px;
+  bottom: 24px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(240, 243, 239, .45);
+  border-radius: 50%;
+  background: rgba(9, 15, 16, .45);
+  color: #f0f3ef;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.marketing-services-page .marketing-video-toggle:focus-visible { outline: 2px solid #a9ceca; outline-offset: 4px; }
+
+@media (min-width: 901px) and (max-width: 1050px) {
+  body:has(.marketing-services-page) .fluid-nav.is-marketing .nav-links { display: none; }
+}
+
+@media (max-width: 900px) {
+  .marketing-services-page .marketing-hero { min-height: max(680px, 100svh); padding: 135px 6vw 80px; }
+  .marketing-services-page .marketing-title { font-size: clamp(58px, 9.5vw, 90px); }
+  .marketing-services-page .marketing-description { max-width: 310px; font-size: 14px; }
+  .marketing-services-page .marketing-video { object-position: 69% center; }
+  .marketing-services-page .stage-scroll { display: flex; }
+  .marketing-services-page .marketing-hero-actions { right: 6vw; }
+}
+
+@media (max-width: 600px) {
+  .marketing-services-page .marketing-hero { min-height: max(660px, 100svh); align-items: center; padding: 120px 24px 82px; }
+  .marketing-services-page .marketing-video { object-position: 66% center; }
+  .marketing-services-page .marketing-hero-content { margin: 10px 0 0; }
+  .marketing-services-page .marketing-eyebrow { gap: 10px; margin-bottom: 38px; font-size: 9px; }
+  .marketing-services-page .marketing-title { margin-bottom: 34px; font-size: clamp(45px, 12vw, 68px); line-height: .94; letter-spacing: -.025em; }
+  .marketing-services-page .marketing-title-accent { margin-left: 18px; }
+  .marketing-services-page .marketing-description { max-width: 310px; margin-bottom: 0; font-size: 14px; line-height: 1.7; }
+  .marketing-services-page .marketing-hero-actions { right: 24px; bottom: 100px; }
+  .marketing-services-page .stage-scroll { bottom: 14px; }
+  .marketing-services-page .marketing-video-toggle { left: 18px; bottom: 16px; width: 38px; height: 38px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-services-page .marketing-video { transition: none; }
+}
+
+/* ================================================================
+   MARKETING SECTION 02 — What We Make Possible
+   Namespaced to this route; the homepage's shared CSS stays intact.
+   ================================================================ */
+.marketing-services-page .marketing-possibilities {
+  --mo-ink: #101a1b;
+  --mo-teal: #104850;
+  --mo-muted: #627572;
+  position: relative;
+  padding: clamp(100px, 12vw, 180px) 6.3vw clamp(95px, 10vw, 160px);
+  background: #f0f3ef;
+  color: var(--mo-ink);
+  scroll-margin-top: 70px;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: clip;
+}
+.marketing-services-page .marketing-possibilities-intro {
+  display: grid;
+  grid-template-columns: minmax(155px, 1fr) minmax(0, 3fr);
+  gap: clamp(24px, 6vw, 110px);
+  margin-bottom: clamp(90px, 10vw, 170px);
+}
+.marketing-services-page .marketing-possibilities-index,
+.marketing-services-page .marketing-possibilities-rule {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .13em;
+  line-height: 1.7;
+}
+.marketing-services-page .marketing-possibilities-index {
+  margin: 12px 0 0;
+  color: var(--mo-teal);
+}
+.marketing-services-page .marketing-possibilities-intro h2 {
+  margin: 0;
+  font-size: clamp(54px, 7.8vw, 138px);
+  letter-spacing: -.075em;
+  line-height: .98;
+  font-weight: 450;
+  color: var(--mo-ink);
+}
+/* Two editorial lines; only the second line is indented and teal. */
+.marketing-services-page .marketing-possibilities-intro h2 > .marketing-reveal-line {
+  display: block;
+}
+.marketing-services-page .marketing-possibilities-intro h2 > .marketing-reveal-line-accent {
+  padding-left: clamp(15px, 5vw, 95px);
+  color: var(--mo-teal);
+}
+/* Reveal masks preserve normal line wrapping while clipping each rising word. */
+.marketing-services-page .marketing-reveal-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: baseline;
+  padding: .06em 0 .14em;
+  margin: -.06em 0 -.14em;
+}
+.marketing-services-page .marketing-reveal-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.marketing-services-page .marketing-possibilities-statement {
+  max-width: 640px;
+  margin: clamp(42px, 5vw, 75px) 0 0;
+  color: #104850;
+  font-size: clamp(22px, 2.5vw, 38px);
+  font-weight: 430;
+  letter-spacing: -.037em;
+  line-height: 1.23;
+}
+.marketing-services-page .marketing-possibilities-rule {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #10485040;
+  color: var(--mo-muted);
+}
+
+/* ================================================================
+   SECTION 02 — PINNED OUTCOME SHOWCASE
+   Intro above remains light; the single changing creative stage is dark.
+   All rules are route-scoped. No shared Services or homepage overrides.
+   ================================================================ */
+.marketing-services-page .marketing-possibilities {
+  padding-bottom: 0;
+  overflow: visible; /* A pinned ScrollTrigger cannot be inside overflow: clip. */
+}
+.marketing-services-page .marketing-possibilities-intro {
+  padding: 0 6.3vw;
+}
+.marketing-services-page .marketing-possibilities-rule {
+  margin: 0 6.3vw;
+}
+/* The taller internal staircase can extend into the light introduction; keep its copy above the blocks. */
+.marketing-services-page .marketing-possibilities-intro,
+.marketing-services-page .marketing-possibilities-rule {
+  position: relative;
+  z-index: 31;
+}
+.marketing-services-page .marketing-outcomes-divider {
+  /* The wrapper bottom is the first visible edge of the rising blocks. Place it 3.8–4cm above the header rule. */
+  --marketing-divider-visual-offset: calc(clamp(108px, 12vh, 140px) + 40px - clamp(145px, calc(40px + 10vh), 151px));
+}
+.marketing-services-page .marketing-outcomes-divider .sd-col,
+.marketing-services-page .marketing-outcomes-divider .sd-frame {
+  transform: translateY(var(--marketing-divider-visual-offset));
+}
+.marketing-services-page .marketing-outcomes-divider .sd-frame {
+  border-bottom-width: 0;
+}
+.marketing-services-page .marketing-outcomes-divider .sd-col {
+  height: calc(12vh + var(--i) * 8vh);
+}
+.marketing-services-page .marketing-outcomes-stage {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: min(760px, 100svh);
+  height: 100svh;
+  padding: clamp(108px, 12vh, 140px) 6.3vw clamp(45px, 6vh, 70px);
+  background: #090f10;
+  color: #f0f3ef;
+  overflow: hidden;
+}
+.marketing-services-page .marketing-outcomes-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 58% 65% at 54% 52%, #10485042, transparent 75%);
+  pointer-events: none;
+}
+.marketing-services-page .marketing-outcomes-stage-header,
+.marketing-services-page .marketing-outcomes-stage-footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  color: #a9ceca;
+  letter-spacing: .14em;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.marketing-services-page .marketing-outcomes-stage-header { padding-bottom: 25px; border-bottom: 1px solid #a9ceca38; }
+.marketing-services-page .marketing-outcomes-stage-footer { padding-top: 25px; border-top: 1px solid #a9ceca38; }
+.marketing-services-page .marketing-outcomes-window {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.marketing-services-page .marketing-outcome-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+  align-items: center;
+  gap: clamp(30px, 5vw, 90px);
+  min-height: 0;
+  padding: clamp(54px, 6vw, 90px) 0;
+  border-bottom: 1px solid #a9ceca24;
+  scroll-margin-top: 90px;
+}
+.marketing-services-page .marketing-outcome-row:nth-child(even) .marketing-outcome-media-wrap { order: 2; }
+.marketing-services-page .marketing-outcome-row:nth-child(even) .marketing-outcome-copy { order: 1; }
+/* The JS class is only applied after the desktop GSAP context initializes.
+   Non-JS, mobile and reduced-motion users retain readable document flow. */
+.marketing-services-page .marketing-outcomes-stage.is-enhanced .marketing-outcome-row {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(28px, 4vw, 55px) 0;
+  border: 0;
+  pointer-events: none;
+}
+.marketing-services-page .marketing-outcomes-stage.is-enhanced .marketing-outcome-row.is-current { pointer-events: auto; }
+.marketing-services-page .marketing-outcome-media-wrap {
+  position: relative;
+  min-width: 0;
+  perspective: 1300px;
+  will-change: clip-path, transform;
+}
+.marketing-services-page .marketing-outcome-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1635 / 962;
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0b1e20;
+  color: #f0f3ef;
+  box-shadow: 0 35px 70px -34px #000b;
+  transform-style: preserve-3d;
+}
+.marketing-services-page .marketing-outcome-media-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Preserve image-internal typography and art. */
+}
+.marketing-services-page .marketing-outcome-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(350px circle at var(--mx, 50%) var(--my, 50%), #ffffff1c, transparent 72%);
+  transition: opacity 400ms ease;
+}
+.marketing-services-page .marketing-outcome-media { transition: box-shadow 600ms ease; }
+.marketing-services-page .marketing-outcome-media:hover { box-shadow: 0 48px 75px -28px #000d; }
+.marketing-services-page .marketing-outcome-media:hover .marketing-outcome-glare { opacity: 1; }
+.marketing-services-page .marketing-outcome-media-caption {
+  position: absolute;
+  left: 18px;
+  bottom: 15px;
+  z-index: 2;
+  max-width: calc(100% - 36px);
+  padding: 8px 13px;
+  border: 1px solid #a9ceca38;
+  border-radius: 50px;
+  background: #081719e0;
+  color: #d2e2db;
+  font-size: 10px;
+  letter-spacing: .015em;
+}
+.marketing-services-page .marketing-outcome-copy { min-width: 0; padding: 12px 0; }
+.marketing-services-page .marketing-outcome-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 300px;
+  margin: 0 0 clamp(16px, 3vw, 33px);
+  color: #a9ceca;
+  font-size: 11px;
+  letter-spacing: .14em;
+}
+.marketing-services-page .marketing-outcome-kicker span:last-child { font-size: 21px; }
+.marketing-services-page .marketing-outcome-title {
+  margin: 0 0 22px;
+  max-width: 11ch;
+  font-size: clamp(46px, 5.1vw, 82px);
+  font-weight: 450;
+  line-height: .99;
+  letter-spacing: -.065em;
+  color: #f0f3ef;
+}
+.marketing-services-page .marketing-outcome-description {
+  max-width: 36ch;
+  margin: 0 0 26px;
+  font-size: clamp(16px, 1.45vw, 22px);
+  line-height: 1.5;
+  letter-spacing: -.02em;
+  color: #b9cfcb;
+}
+.marketing-services-page .marketing-outcome-services-label {
+  margin: 0 0 10px;
+  color: #9cbfba;
+  letter-spacing: .14em;
+  font-size: 10px;
+}
+.marketing-services-page .marketing-outcome-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+}
+.marketing-services-page .marketing-outcome-services li {
+  padding: 9px 12px;
+  border: 1px solid #a9ceca4d;
+  border-radius: 60px;
+  color: #d8e9e5;
+  font-size: 11px;
+  line-height: 1.25;
+}
+.marketing-services-page .marketing-outcome-work-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  width: fit-content;
+  padding: 0 0 9px;
+  border-bottom: 1px solid #a9ceca8c;
+  color: #f0f3ef;
+  font-size: 13px;
+  text-decoration: none;
+}
+.marketing-services-page .marketing-outcome-work-link span { transition: transform 300ms ease; }
+.marketing-services-page .marketing-outcome-work-link:hover span { transform: translate(3px, -3px); }
+.marketing-services-page .marketing-outcome-work-link:focus-visible { outline: 2px solid #a9ceca; outline-offset: 5px; }
+.marketing-services-page .marketing-outcomes-progress {
+  height: 2px;
+  flex: 0 1 22%;
+  background: #a9ceca47;
+  overflow: hidden;
+}
+.marketing-services-page .marketing-outcomes-progress > span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: #a9ceca;
+}
+
+/* CSS-only illustrative concept retained for Local Visibility. */
+.marketing-services-page .moc-art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  height: 100%;
+  padding: clamp(18px, 2.3vw, 34px);
+  overflow: hidden;
+  font-family: var(--inter), Inter, Arial, sans-serif;
+}
+.marketing-services-page .moc-art-top,
+.marketing-services-page .moc-art-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  font-size: clamp(7px, .65vw, 10px);
+  font-weight: 500;
+  letter-spacing: .11em;
+  line-height: 1.5;
+}
+.marketing-services-page .moc-art-foot b { font-size: 25px; font-weight: 400; }
+.marketing-services-page .moc-local-grid {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.marketing-services-page .moc-art-local { background: #cfddd8; color: #15474a; }
+.marketing-services-page .moc-local-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5%; align-items: center; }
+.marketing-services-page .moc-local-map { position: relative; height: 95%; background: repeating-linear-gradient(0deg,transparent 0 52px,#fff9 53px 55px,transparent 56px 108px), repeating-linear-gradient(90deg,transparent 0 75px,#fff9 76px 78px,transparent 79px 154px),#98bab0; overflow: hidden; }
+.marketing-services-page .moc-local-road { position: absolute; height: 16px; background: #e4eee6; width: 155%; left: -25%; }
+.marketing-services-page .moc-road-one { top: 18%; transform: rotate(29deg); }
+.marketing-services-page .moc-road-two { top: 68%; transform: rotate(-39deg); }
+.marketing-services-page .moc-road-three { top: 46%; transform: rotate(12deg); }
+.marketing-services-page .moc-pin { position: absolute; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50% 50% 50% 0; background: #104850; border: 4px solid #edf4ed; color: #b8d4cd; transform: rotate(-45deg); box-shadow: 0 4px 14px #23534a55; }
+.marketing-services-page .moc-pin-one { left: 18%; top: 20%; }
+.marketing-services-page .moc-pin-two { left: 66%; top: 50%; }
+.marketing-services-page .moc-pin-three { left: 33%; top: 75%; }
+.marketing-services-page .moc-pin::first-letter { transform: rotate(45deg); }
+.marketing-services-page .moc-local-card { display: flex; flex-direction: column; justify-content: space-between; height: 80%; padding: 8%; background: #fafbf5; box-shadow: 7px 14px 30px #17433d23; transform: rotate(5deg); }
+.marketing-services-page .moc-local-card small { font-size: 9px; letter-spacing: .08em; }
+.marketing-services-page .moc-local-card strong { font-size: clamp(24px, 2.7vw, 49px); font-weight: 550; letter-spacing: -.065em; line-height: .99; }
+.marketing-services-page .moc-local-card > span { font-size: clamp(8px, .7vw, 11px); }
+
+
+@media (min-width: 901px) {
+  .marketing-services-page .marketing-outcomes-stage:not(.is-enhanced) {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 1100px) {
+  .marketing-services-page .marketing-outcome-row { gap: 4vw; }
+  .marketing-services-page .marketing-outcome-title { font-size: clamp(40px, 5vw, 66px); }
+}
+@media (max-width: 900px) {
+  .marketing-services-page .marketing-outcomes-divider .sd-col {
+    height: calc(6vh + var(--i) * 6vh);
+  }
+  .marketing-services-page .marketing-outcomes-divider {
+    --marketing-divider-visual-offset: calc(90px + 40px - clamp(96px, 12vw, 110px));
+  }
+  .marketing-services-page .marketing-possibilities { padding: 88px 0 0; }
+  .marketing-services-page .marketing-possibilities-intro { display: block; margin: 0 0 75px; padding: 0 6vw; }
+  .marketing-services-page .marketing-possibilities-index { margin: 0 0 32px; }
+  .marketing-services-page .marketing-possibilities-intro h2 { font-size: clamp(52px, 8.8vw, 90px); }
+  .marketing-services-page .marketing-possibilities-statement { max-width: 580px; font-size: clamp(21px, 3.5vw, 30px); margin-top: 34px; }
+  .marketing-services-page .marketing-possibilities-rule { margin: 0 6vw; }
+  .marketing-services-page .marketing-outcomes-stage { height: auto; min-height: 0; padding: 90px 6vw 48px; }
+  .marketing-services-page .marketing-outcome-row,
+  .marketing-services-page .marketing-outcome-row:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 50px 0;
+    min-height: 85svh;
+  }
+  .marketing-services-page .marketing-outcome-row:nth-child(even) .marketing-outcome-media-wrap,
+  .marketing-services-page .marketing-outcome-row:nth-child(even) .marketing-outcome-copy { order: initial; }
+  .marketing-services-page .marketing-outcome-copy { padding: 0; }
+  .marketing-services-page .marketing-outcome-title { font-size: clamp(40px, 7vw, 60px); }
+  .marketing-services-page .marketing-outcomes-stage-footer { flex-wrap: wrap; }
+  .marketing-services-page .marketing-outcomes-progress { display: none; }
+}
+@media (max-width: 600px) {
+  .marketing-services-page .marketing-outcomes-divider {
+    --marketing-divider-visual-offset: calc(84px + 40px - clamp(72px, 14vw, 84px));
+  }
+  .marketing-services-page .marketing-possibilities { padding-top: 75px; }
+  .marketing-services-page .marketing-possibilities-intro { padding: 0 24px; margin-bottom: 66px; }
+  .marketing-services-page .marketing-possibilities-index { font-size: 9px; }
+  .marketing-services-page .marketing-possibilities-intro h2 { font-size: clamp(44px, 11vw, 62px); line-height: 1.02; }
+  .marketing-services-page .marketing-possibilities-intro h2 > .marketing-reveal-line-accent { padding-left: 12px; }
+  .marketing-services-page .marketing-possibilities-statement { font-size: 23px; line-height: 1.26; }
+  .marketing-services-page .marketing-possibilities-rule { margin-inline: 24px; font-size: 8px; }
+  .marketing-services-page .marketing-outcomes-stage { padding: 84px 24px 38px; }
+  .marketing-services-page .marketing-outcome-row { min-height: 82svh; gap: 30px; padding: 42px 0; }
+  .marketing-services-page .marketing-outcome-media { aspect-ratio: 1635 / 962; }
+  .marketing-services-page .marketing-outcome-media-caption { font-size: 9px; padding: 7px 10px; bottom: 9px; left: 9px; }
+  .marketing-services-page .marketing-outcome-title { font-size: clamp(38px, 10vw, 53px); }
+  .marketing-services-page .marketing-outcome-description { font-size: 16px; }
+  .marketing-services-page .marketing-outcome-services li { font-size: 10px; }
+  .marketing-services-page .moc-art { padding: 17px; }
+  .marketing-services-page .moc-art-top,.marketing-services-page .moc-art-foot { font-size: 7px; }
+  .marketing-services-page .moc-local-card strong { font-size: 23px!important; }
+  .marketing-services-page .moc-local-map { height: 94%; }
+  .marketing-services-page .moc-pin { width: 25px; height: 25px; border-width: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marketing-services-page .marketing-outcomes-stage { height: auto; min-height: 0; overflow: visible; }
+  .marketing-services-page .marketing-outcome-row { position: relative; opacity: 1; visibility: visible; }
+  .marketing-services-page .marketing-outcome-media,
+  .marketing-services-page .marketing-outcome-work-link span,
+  .marketing-services-page .marketing-outcome-glare { transition: none; }
+}

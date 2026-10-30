@@ -2,6 +2,7 @@ node_modules
 .next
 .next-studio
 .next-dev
+.tmp-tools/
 .env
 .env.local
 .taste-skill/

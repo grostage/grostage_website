@@ -1,15 +1,31 @@
 'use client';
 import { useEffect, useState } from 'react';
+
+const MARKETING_SERVICES = new Set([
+  'Branding & Identity',
+  'Creative Production',
+  'Social Media Marketing',
+  'Performance Advertising',
+  'SEO & Local Marketing',
+  'Business & Brand Materials',
+]);
 export default function ContactForm() {
   const [s,setS] = useState({name:'',email:'',message:''});
   const [status,setStatus] = useState('');
   const [pending,setPending] = useState(false);
-  // Services chosen on the Services page arrive as ?interest=… and start the message.
+  // Marketing services use a validated `service` value. Keep the existing
+  // `interest` query support for the Services page and its multi-select flow.
   useEffect(() => {
-    const interest = new URLSearchParams(location.search).get('interest');
-    if (interest) setS(v => v.message ? v : {...v, message: `I'm interested in: ${interest.slice(0, 300)}.
-
-`});
+    const params = new URLSearchParams(window.location.search);
+    const service = params.get('service');
+    const queryValue = MARKETING_SERVICES.has(service) ? service : params.get('interest');
+    const interest = queryValue?.slice(0, 300).replace(/[\u0000-\u001f\u007f]/g, ' ').trim();
+    if (interest) {
+      setS(value => value.message ? value : {
+        ...value,
+        message: `I'm interested in: ${interest}.\n\n`,
+      });
+    }
   }, []);
   const send = async e => {
     e.preventDefault(); if(pending) return; setPending(true); setStatus('');
