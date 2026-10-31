@@ -497,55 +497,6 @@
   background: #a9ceca;
 }
 
-/* CSS-only illustrative concept retained for Local Visibility. */
-.marketing-services-page .moc-art {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-  height: 100%;
-  padding: clamp(18px, 2.3vw, 34px);
-  overflow: hidden;
-  font-family: var(--inter), Inter, Arial, sans-serif;
-}
-.marketing-services-page .moc-art-top,
-.marketing-services-page .moc-art-foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  z-index: 1;
-  font-size: clamp(7px, .65vw, 10px);
-  font-weight: 500;
-  letter-spacing: .11em;
-  line-height: 1.5;
-}
-.marketing-services-page .moc-art-foot b { font-size: 25px; font-weight: 400; }
-.marketing-services-page .moc-local-grid {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-}
-.marketing-services-page .moc-art-local { background: #cfddd8; color: #15474a; }
-.marketing-services-page .moc-local-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5%; align-items: center; }
-.marketing-services-page .moc-local-map { position: relative; height: 95%; background: repeating-linear-gradient(0deg,transparent 0 52px,#fff9 53px 55px,transparent 56px 108px), repeating-linear-gradient(90deg,transparent 0 75px,#fff9 76px 78px,transparent 79px 154px),#98bab0; overflow: hidden; }
-.marketing-services-page .moc-local-road { position: absolute; height: 16px; background: #e4eee6; width: 155%; left: -25%; }
-.marketing-services-page .moc-road-one { top: 18%; transform: rotate(29deg); }
-.marketing-services-page .moc-road-two { top: 68%; transform: rotate(-39deg); }
-.marketing-services-page .moc-road-three { top: 46%; transform: rotate(12deg); }
-.marketing-services-page .moc-pin { position: absolute; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50% 50% 50% 0; background: #104850; border: 4px solid #edf4ed; color: #b8d4cd; transform: rotate(-45deg); box-shadow: 0 4px 14px #23534a55; }
-.marketing-services-page .moc-pin-one { left: 18%; top: 20%; }
-.marketing-services-page .moc-pin-two { left: 66%; top: 50%; }
-.marketing-services-page .moc-pin-three { left: 33%; top: 75%; }
-.marketing-services-page .moc-pin::first-letter { transform: rotate(45deg); }
-.marketing-services-page .moc-local-card { display: flex; flex-direction: column; justify-content: space-between; height: 80%; padding: 8%; background: #fafbf5; box-shadow: 7px 14px 30px #17433d23; transform: rotate(5deg); }
-.marketing-services-page .moc-local-card small { font-size: 9px; letter-spacing: .08em; }
-.marketing-services-page .moc-local-card strong { font-size: clamp(24px, 2.7vw, 49px); font-weight: 550; letter-spacing: -.065em; line-height: .99; }
-.marketing-services-page .moc-local-card > span { font-size: clamp(8px, .7vw, 11px); }
-
-
 @media (min-width: 901px) {
   .marketing-services-page .marketing-outcomes-stage:not(.is-enhanced) {
     height: auto;
@@ -604,11 +555,6 @@
   .marketing-services-page .marketing-outcome-title { font-size: clamp(38px, 10vw, 53px); }
   .marketing-services-page .marketing-outcome-description { font-size: 16px; }
   .marketing-services-page .marketing-outcome-services li { font-size: 10px; }
-  .marketing-services-page .moc-art { padding: 17px; }
-  .marketing-services-page .moc-art-top,.marketing-services-page .moc-art-foot { font-size: 7px; }
-  .marketing-services-page .moc-local-card strong { font-size: 23px!important; }
-  .marketing-services-page .moc-local-map { height: 94%; }
-  .marketing-services-page .moc-pin { width: 25px; height: 25px; border-width: 3px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .marketing-services-page .marketing-outcomes-stage { height: auto; min-height: 0; overflow: visible; }

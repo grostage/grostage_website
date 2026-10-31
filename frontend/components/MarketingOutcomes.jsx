@@ -4,6 +4,7 @@ import { Fragment, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { gsap, useGSAP } from '@/frontend/lib/gsap';
 import StageDivider from './StageDivider';
+import { marketingMediaById } from '@/backend/lib/marketing-media-config';
 
 // The first three images are approved design concepts, NOT verified client campaigns.
 // Never present numbers printed inside the art as real campaign outcomes.
@@ -12,25 +13,25 @@ const outcomes = [
     id: 'brand', title: 'Brand Building',
     description: 'Give your business a distinctive voice, identity and presence that people remember.',
     services: ['Brand Identity', 'Campaign Creative', 'Social Design'],
-    image: '/images/marketing/brand-building.webp',
+    imageId: 'brand-building',
   },
   {
     id: 'leads', title: 'Lead Generation',
     description: 'Turn attention into enquiries with the right message, campaign and customer journey.',
     services: ['Meta Ads', 'Google Ads', 'Campaign Content'],
-    image: '/images/marketing/lead-generation.webp',
+    imageId: 'lead-generation',
   },
   {
     id: 'sales', title: 'Sales Growth',
     description: 'Connect creative storytelling and performance campaigns to stronger buying intent.',
     services: ['Performance Creative', 'Creative Testing', 'Conversion Campaigns'],
-    image: '/images/marketing/sales-growth.webp',
+    imageId: 'sales-growth',
   },
   {
     id: 'local', title: 'Local Visibility',
     description: 'Help nearby customers discover, understand and choose your business.',
     services: ['Google Business Profile', 'Local SEO', 'Local Campaigns'],
-    image: '/images/marketing/local-visibility.webp',
+    imageId: 'local-visibility',
   },
 ];
 
@@ -44,20 +45,7 @@ function RisingWords({ text }) {
   </Fragment>);
 }
 
-// A bespoke visual for the fourth outcome until approved Local Visibility media exists.
-// No claims of real rankings, traffic, ratings or conversions.
-function OutcomeVisual() {
-  return <div className="moc-art moc-art-local" aria-hidden="true">
-    <div className="moc-art-top"><span>DISCOVERY / 04</span><span>SHOW UP WHERE IT MATTERS</span></div>
-    <div className="moc-local-grid">
-      <div className="moc-local-map"><span className="moc-local-road moc-road-one" /><span className="moc-local-road moc-road-two" /><span className="moc-local-road moc-road-three" /><b className="moc-pin moc-pin-one">●</b><b className="moc-pin moc-pin-two">●</b><b className="moc-pin moc-pin-three">●</b></div>
-      <div className="moc-local-card"><small>LOCAL DISCOVERY</small><strong>BE THE<br />BUSINESS<br />THEY FIND.</strong><span>SEARCH → DISCOVER → VISIT</span></div>
-    </div>
-    <div className="moc-art-foot"><span>SEARCH → LOCAL PRESENCE → CONNECTION</span><b>↗</b></div>
-  </div>;
-}
-
-export default function MarketingOutcomes() {
+export default function MarketingOutcomes({ media = {} }) {
   const rootRef = useRef(null);
   const stageRef = useRef(null);
   const headingRef = useRef(null);
@@ -106,7 +94,7 @@ export default function MarketingOutcomes() {
       if (slides.length < 2) return undefined;
 
       const media = slides.map(slide => slide.querySelector('.marketing-outcome-media-wrap'));
-      const artwork = slides.map(slide => slide.querySelector('.marketing-outcome-media-img, .moc-art'));
+      const artwork = slides.map(slide => slide.querySelector('.marketing-outcome-media-img'));
       const copy = slides.map(slide => slide.querySelector('.marketing-outcome-copy'));
       const items = slides.map(slide => gsap.utils.toArray('.marketing-outcome-kicker, .marketing-outcome-title, .marketing-outcome-description, .marketing-outcome-services-label, .marketing-outcome-services li, .marketing-outcome-work-link', slide));
       const strip = 'inset(49% 0% 49% 0% round 14px)'; // ~12px of a 600px frame
@@ -259,27 +247,27 @@ export default function MarketingOutcomes() {
     <div className="marketing-outcomes-stage" ref={stageRef} data-nav-theme="dark" role="region" aria-label="Marketing objectives: scroll to explore four outcomes">
       <div className="marketing-outcomes-stage-header"><span>GROSTAGE / GROWTH STUDIO</span><span ref={counterRef} className="marketing-outcomes-counter">01 / 04</span></div>
       <div className="marketing-outcomes-window">
-        {outcomes.map((item, index) => <article className="marketing-outcome-row" key={item.id} id={`marketing-outcome-${item.id}`} aria-labelledby={`marketing-outcome-title-${item.id}`}>
-          <div className="marketing-outcome-media-wrap">
-            <figure className="marketing-outcome-media" role="img" aria-label={`${item.title}: illustrative concept design, not verified client work or measured results`}>
-              {item.image
-                ? <img className="marketing-outcome-media-img" src={item.image} alt={`Illustrative ${item.title.toLowerCase()} creative composition, not actual client work`} loading="eager" decoding="async" />
-                : <OutcomeVisual />}
-              <span className="marketing-outcome-glare" aria-hidden="true" />
-              {!item.image && <figcaption className="marketing-outcome-media-caption">Creative concept | Not actual client work or measured results</figcaption>}
-            </figure>
-          </div>
-          <div className="marketing-outcome-copy reveal">
-            <div className="marketing-outcome-kicker"><span>0{index + 1} / 04</span><span aria-hidden="true">↗</span></div>
-            <h3 className="marketing-outcome-title" id={`marketing-outcome-title-${item.id}`}>{item.title}</h3>
-            <p className="marketing-outcome-description">{item.description}</p>
-            <p className="marketing-outcome-services-label">WHAT WE CAN DO</p>
-            <ul className="marketing-outcome-services" aria-label={`${item.title} services`}>
-              {item.services.map(service => <li key={service}>{service}</li>)}
-            </ul>
-            <Link className="marketing-outcome-work-link" href="/work">See selected work <span aria-hidden="true">↗</span></Link>
-          </div>
-        </article>)}
+        {outcomes.map((item, index) => {
+          const imageUrl = media[item.imageId] || marketingMediaById[item.imageId]?.defaultUrl;
+          return <article className="marketing-outcome-row" key={item.id} id={`marketing-outcome-${item.id}`} aria-labelledby={`marketing-outcome-title-${item.id}`}>
+            <div className="marketing-outcome-media-wrap">
+              <figure className="marketing-outcome-media" role="img" aria-label={`${item.title}: illustrative concept design, not verified client work or measured results`}>
+                <img className="marketing-outcome-media-img" src={imageUrl} alt={`Illustrative ${item.title.toLowerCase()} creative composition, not actual client work`} loading="eager" decoding="async" />
+                <span className="marketing-outcome-glare" aria-hidden="true" />
+              </figure>
+            </div>
+            <div className="marketing-outcome-copy reveal">
+              <div className="marketing-outcome-kicker"><span>0{index + 1} / 04</span><span aria-hidden="true">↗</span></div>
+              <h3 className="marketing-outcome-title" id={`marketing-outcome-title-${item.id}`}>{item.title}</h3>
+              <p className="marketing-outcome-description">{item.description}</p>
+              <p className="marketing-outcome-services-label">WHAT WE CAN DO</p>
+              <ul className="marketing-outcome-services" aria-label={`${item.title} services`}>
+                {item.services.map(service => <li key={service}>{service}</li>)}
+              </ul>
+              <Link className="marketing-outcome-work-link" href="/work">See selected work <span aria-hidden="true">↗</span></Link>
+            </div>
+          </article>;
+        })}
       </div>
       <div className="marketing-outcomes-stage-footer">
         <span>SCROLL TO EXPLORE <span aria-hidden="true">↓</span></span>

@@ -12,7 +12,7 @@ const SERVICES = [
     name: 'Branding & Identity',
     description: 'Build a recognizable brand through thoughtful strategy, identity design and consistent communication.',
     items: ['Logo Design', 'Brand Identity', 'Brand Guidelines', 'Rebranding'],
-    image: '/images/marketing/services/brand-identity.webp',
+    imageId: 'branding-identity',
     visualAlt: 'Illustrative identity presentation with branded stationery, palette and brand guidelines',
     visualTitle: 'A distinct identity for a lasting impression.',
     visualDetail: 'Logo systems, brand language and design standards that work together.',
@@ -23,7 +23,7 @@ const SERVICES = [
     name: 'Creative Production',
     description: 'Give your ideas a compelling visual form through filming, editing, motion design and campaign content.',
     items: ['Campaign Creatives', 'Reels & Video', 'Motion Graphics', 'AI Video'],
-    image: '/images/marketing/services/creative-production.webp',
+    imageId: 'creative-production',
     visualAlt: 'Illustrative cinematic production set featuring camera equipment and studio lighting',
     visualTitle: 'Ideas, made visible.',
     visualDetail: 'Concept → Shoot → Edit → Deliver',
@@ -34,7 +34,7 @@ const SERVICES = [
     name: 'Social Media Marketing',
     description: 'Create a consistent voice across channels with planned content, creative storytelling and management.',
     items: ['Content Planning', 'Social Media Management', 'Social Creatives', 'Community Engagement'],
-    image: '/images/marketing/services/social-media.webp',
+    imageId: 'social-media',
     visualAlt: 'Illustrative social media campaign with mobile feed and multiple content formats',
     visualTitle: 'Stories worth following.',
     visualDetail: 'Editorial content, social design and purposeful publishing.',
@@ -45,7 +45,7 @@ const SERVICES = [
     name: 'Performance Advertising',
     description: 'Bring the right message to the right audience with targeted campaigns and ongoing optimization.',
     items: ['Meta Ads', 'Google Ads', 'LinkedIn Ads', 'Creative Testing'],
-    image: '/images/marketing/services/performance-ads.webp',
+    imageId: 'performance-advertising',
     visualAlt: 'Illustrative product advertisement with campaign graphics and shopping mockup',
     visualTitle: 'Creativity with a purpose.',
     visualDetail: 'Campaign planning → Creative testing → Optimization',
@@ -56,7 +56,7 @@ const SERVICES = [
     name: 'SEO & Local Marketing',
     description: 'Improve discoverability in search and help nearby customers find, understand and choose your business.',
     items: ['SEO', 'Local SEO', 'Google Business Profile', 'Search Visibility'],
-    image: '/images/marketing/services/seo-local.webp',
+    imageId: 'seo-local',
     visualAlt: 'Illustrative location search interface over a night-time map with business discovery results',
     visualTitle: 'Be found where it matters.',
     visualDetail: 'Search → Discover → Visit',
@@ -67,7 +67,7 @@ const SERVICES = [
     name: 'Business & Brand Materials',
     description: 'Present your company clearly and professionally through documents designed to inform and persuade.',
     items: ['Company Profiles', 'Brochures', 'Pitch Decks', 'Brand Collateral'],
-    image: '/images/marketing/services/brand-materials.webp',
+    imageId: 'brand-materials',
     visualAlt: 'Illustrative premium company profile and printed brand presentation materials',
     visualTitle: 'Every detail tells your story.',
     visualDetail: 'Profiles, brochures and presentations built for the conversation.',
@@ -75,7 +75,7 @@ const SERVICES = [
   },
 ];
 
-export default function MarketingServicesExplorer() {
+export default function MarketingServicesExplorer({ media = {} }) {
   const root = useRef(null);
   const card = useRef(null);
   const [active, setActive] = useState(0);
@@ -272,7 +272,10 @@ export default function MarketingServicesExplorer() {
                         {service.items.map(item => <li key={item}>{item}</li>)}
                       </ul>
                       <div className="ms3-mobile-visual">
-                        <img src={service.image} alt={service.visualAlt} loading="lazy" decoding="async" />
+                        <div className="ms3-mobile-image-frame">
+                          <img className="ms3-mobile-backdrop" src={media[service.imageId]} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                          <img className="ms3-mobile-foreground" src={media[service.imageId]} alt={service.visualAlt} loading="lazy" decoding="async" />
+                        </div>
                         <span>Illustrative service concept</span>
                       </div>
                     </div>
@@ -287,7 +290,8 @@ export default function MarketingServicesExplorer() {
               {SERVICES.map((service, index) => (
                 <div key={service.id} data-index={index} className={`ms3-scene${previewIndex === index ? ' is-active' : ''}`} aria-hidden={previewIndex !== index}>
                   <div className="ms3-scene-image">
-                    <img src={service.image} alt="" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" />
+                    <img className="ms3-scene-backdrop" src={media[service.imageId]} alt="" aria-hidden="true" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" />
+                    <img className="ms3-scene-foreground" src={media[service.imageId]} alt="" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" />
                   </div>
                   <div className="ms3-scene-shade" />
                   <div className="ms3-preview-top">

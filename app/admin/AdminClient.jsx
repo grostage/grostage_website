@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import MarketingMediaPanel from './MarketingMediaPanel';
 
 const empty = { title: '', slug: '', category: '', excerpt: '', content: '', tags: '', image: '', published: true };
 const footerFields = [['tagline', 'Tagline'], ['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['copyright', 'Copyright text']];
@@ -28,6 +29,7 @@ export default function AdminClient() {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const fileInputRef = useRef(null);
+  const marketingMediaRef = useRef(null);
   const router = useRouter();
 
   const load = async () => {
@@ -44,7 +46,7 @@ export default function AdminClient() {
     setMessage('');
     setUploadError('');
     setUploading(false);
-    load();
+    if (tab !== 'marketing-media') load();
   }, [tab]);
 
   const save = async () => {
@@ -140,11 +142,16 @@ export default function AdminClient() {
   return <main id="main-content" className="sec top adm"><div className="wrap">
     <div className="row between"><h1 className="h2" style={{ fontSize: 40 }}>Admin</h1><button className="btn ghost sm" onClick={logOut}>Log out</button></div>
     <div className="tabs">
-      {[['works', 'Work'], ['posts', 'Blog posts'], ['contacts', 'Contact submissions'], ['footer', 'Footer']].map(([key, label]) =>
-        <button key={key} className={tab === key ? 'on' : ''} onClick={() => setTab(key)}>{label}</button>
+      {[['works', 'Work'], ['posts', 'Blog posts'], ['contacts', 'Contact submissions'], ['footer', 'Footer'], ['marketing-media', 'Marketing Media']].map(([key, label]) =>
+        <button key={key} className={tab === key ? 'on' : ''} onClick={() => {
+          if (tab === 'marketing-media' && key !== tab && marketingMediaRef.current && !marketingMediaRef.current.confirmDiscard()) return;
+          setTab(key);
+        }}>{label}</button>
       )}
     </div>
     {message && <p className="mut" role="status" aria-live="polite">{message}</p>}
+
+    {tab === 'marketing-media' && <MarketingMediaPanel ref={marketingMediaRef} />}
 
     {tab === 'footer' && footer && <div className="cform">
       {footerFields.map(([key, label]) => <label key={key}>{label}<input value={footer[key] || ''} onChange={event => setFooter({ ...footer, [key]: event.target.value })} /></label>)}

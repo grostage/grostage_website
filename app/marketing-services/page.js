@@ -2,6 +2,7 @@ import MarketingHero from '@/frontend/components/MarketingHero';
 import StageDivider from '@/frontend/components/StageDivider';
 import MarketingOutcomes from '@/frontend/components/MarketingOutcomes';
 import MarketingServicesExplorer from '@/frontend/components/MarketingServicesExplorer';
+import { getMarketingMedia } from '@/backend/lib/marketing-media';
 import '../marketing-services.css';
 import '../marketing-services-explorer.css';
 
@@ -20,13 +21,14 @@ export const metadata = {
   },
 };
 
-export default function MarketingServicesPage() {
+export default async function MarketingServicesPage() {
+  const media = await getMarketingMedia();
   return (
     <main id="main-content" className="marketing-services-page">
       <MarketingHero />
       <StageDivider from="#050505" to="#f0f3ef" accent="#104850" />
-      <MarketingOutcomes />
-      <MarketingServicesExplorer />
+      <MarketingOutcomes media={media} />
+      <MarketingServicesExplorer media={media} />
     </main>
   );
 }
