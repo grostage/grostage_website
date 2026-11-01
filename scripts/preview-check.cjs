@@ -8,7 +8,7 @@ const fs = require('node:fs');
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')console.log('BROWSER: '+m.text().slice(0,1000));});
-  const paths=['/','/about','/services','/work','/work/fruitup','/work/chanakya-properties','/work/custom-erp','/work/warehouse-app','/work/samsung-exclusive-store','/work/soorya-solar','/blog','/blog/technology-with-a-business-purpose','/blog/from-information-to-action','/blog/building-commerce-around-customers','/blog/from-business-problem-to-outcome','/client-stories','/contact','/admin/login'];
+  const paths=['/','/about','/services','/work','/work/fruitup','/work/chanakya-properties','/work/custom-erp','/work/warehouse-app','/work/samsung-exclusive-store','/work/soorya-solar','/blog','/blog/technology-with-a-business-purpose','/blog/from-information-to-action','/blog/building-commerce-around-customers','/blog/from-business-problem-to-outcome','/client-stories','/contact','/adminportal/login'];
   for(const path of paths){
     const response=await page.goto('http://127.0.0.1:3000'+path,{waitUntil:'networkidle',timeout:90000});
     await page.evaluate(async()=>{for(let y=0;y<document.body.scrollHeight;y+=700){window.scrollTo(0,y);await new Promise(r=>setTimeout(r,35));}window.scrollTo(0,0);});

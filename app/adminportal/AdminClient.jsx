@@ -125,7 +125,7 @@ export default function AdminClient() {
 
   const logOut = async () => {
     await fetch('/api/login', { method: 'DELETE' });
-    location.href = '/admin/login';
+    location.href = '/adminportal/login';
   };
 
   const edit = row => {

@@ -22,7 +22,7 @@ One partner across four disciplines: Digital Products, Business Technology (ERP/
 ## Operating Context
 
 - Next.js 15 (App Router), React 19, GSAP + ScrollTrigger + Lenis smooth scroll, framer-motion available. Postgres-backed content with a static fallback in `backend/lib/content.js`.
-- Case studies ("works") are edited in `/admin`: title, slug, category, excerpt, Markdown-ish content (`## ` headings make chapters), cover image, image alt, gallery, comma-separated tags, `representative` flag, published.
+- Case studies ("works") are edited in `/adminportal`: title, slug, category, excerpt, Markdown-ish content (`## ` headings make chapters), cover image, image alt, gallery, comma-separated tags, `representative` flag, published.
 - Deployed on Hostinger.
 
 ## Capabilities and Constraints

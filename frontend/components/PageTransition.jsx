@@ -20,7 +20,7 @@ export default function PageTransition() {
       const a = e.target.closest('a');
       if (!a || a.target || a.hasAttribute('download')) return;
       const url = new URL(a.href, location.href);
-      if (url.origin !== location.origin || url.pathname === location.pathname || url.pathname.startsWith('/admin') || location.pathname.startsWith('/admin')) return;
+      if (url.origin !== location.origin || url.pathname === location.pathname || url.pathname.startsWith('/adminportal') || location.pathname.startsWith('/adminportal') || url.pathname.startsWith('/admin') || location.pathname.startsWith('/admin')) return;
       e.preventDefault();
       if (busy.current) return;
       busy.current = true;

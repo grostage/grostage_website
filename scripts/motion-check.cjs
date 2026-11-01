@@ -5,7 +5,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH);
  page.setDefaultNavigationTimeout(60000);
  await page.route('**/*',route=>{const url=route.request().url();return url.startsWith('http://127.0.0.1:3000') || url.startsWith('data:') ? route.continue() : route.abort();});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error' && m.text().includes('hydr')) errors.push(m.text());});
- for(const route of ['/','/about','/services','/work','/work/fruitup','/blog','/client-stories','/contact','/admin/login']){
+ for(const route of ['/','/about','/services','/work','/work/fruitup','/blog','/client-stories','/contact','/adminportal/login']){
   const response=await page.goto('http://127.0.0.1:3000'+route,{waitUntil:'networkidle'});
   await page.waitForTimeout(1200);
   console.log(JSON.stringify({route,status:response.status(),overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)}));

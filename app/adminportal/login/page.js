@@ -19,7 +19,7 @@ export default function Login() {
       });
       const data = await r.json().catch(() => ({}));
       if (r.ok) {
-        location.href = '/admin';
+        location.href = '/adminportal';
       } else {
         setErr(data.error || 'Wrong email or password');
       }
