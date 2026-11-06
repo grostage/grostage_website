@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { gsap, ScrollTrigger, useGSAP } from '@/frontend/lib/gsap';
 
 export default function WorkMarquee({ works }) {
-  const root = useRef(null);
+  const root = useRef(null); //abc
   useGSAP(() => {
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
