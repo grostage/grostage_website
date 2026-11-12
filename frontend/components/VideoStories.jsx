@@ -1,4 +1,41 @@
-'use client';
-import {useState} from 'react';
-const videos=[{id:'aqz-KE-bpKQ',title:'A conversation about the journey',image:'/projects/profile-13-0.jpeg'},{id:'ScMzIvxBSi4',title:'A new perspective on partnership',image:'/projects/profile-8-0.jpeg'}];
-export default function VideoStories(){const [playing,setPlaying]=useState({});return <div className="video-grid">{videos.map(v=><article key={v.id}><div className="video-frame">{playing[v.id]?<iframe src={'https://www.youtube-nocookie.com/embed/'+v.id+'?autoplay=1'} title={v.title+' — sample video'} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />:<button aria-label={'Play sample video: '+v.title} onClick={()=>setPlaying({...playing,[v.id]:true})}><img src={v.image} alt="" /><span className="play-icon">▶</span><span className="video-sample">SAMPLE VIDEO</span></button>}</div><p className="eyebrow">PLAYER PREVIEW</p><h3>{v.title}</h3></article>)}</div>;}
+const videos = [
+  {
+    id: 'ciaIy8TD8HQ',
+    client: 'FRUITUP',
+    title: 'FruitUp Client Review',
+    iframeTitle: 'FruitUp Client Review Grostage',
+    src: 'https://www.youtube.com/embed/ciaIy8TD8HQ',
+  },
+  {
+    id: 'dxEVUtyKtHY',
+    client: 'DATACORREL',
+    title: 'DataCorrel Client Testimonial',
+    iframeTitle: 'DataCorrel Client Testimonial Grostage',
+    src: 'https://www.youtube.com/embed/dxEVUtyKtHY',
+  },
+];
+
+export default function VideoStories() {
+  return (
+    <div className="video-grid">
+      {videos.map((v) => (
+        <article key={v.id}>
+          <div className="video-frame">
+            <iframe
+              width="357"
+              height="635"
+              src={v.src}
+              title={v.iframeTitle}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              loading="lazy"
+              allowFullScreen
+            />
+          </div>
+          <p className="eyebrow">{v.client}</p>
+          <h3>{v.title}</h3>
+        </article>
+      ))}
+    </div>
+  );
+}

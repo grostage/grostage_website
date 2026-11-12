@@ -26,7 +26,7 @@ export default async function Stories() {
     <StageDivider from="#060908" to="#f0f3ef" />
     <section className="rx rx-light rx-videos">
       <div className="rx-head" data-rx><h2>Stories worth<br /><span className="rx-accent">sharing.</span></h2></div>
-      <p className="rx-note">Video player preview · These are sample YouTube videos, not Grostage client endorsements. Client video links are pending.</p>
+      <p className="rx-note">Client testimonials · Hear directly from the teams behind the projects.</p>
       <VideoStories />
     </section>
     <StageDivider from="#f0f3ef" to="#060908" flip />

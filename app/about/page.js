@@ -20,7 +20,7 @@ export default function About() {
     <PageIntro label="WHO WE ARE" title="One team." accent="Your next stage." description="We are Grostage. A technology and digital growth company building what businesses need next." />
     <StageDivider from="#060908" to="#f0f3ef" />
     <section className="rx rx-light rx-story">
-      <figure className="rx-story-media" data-rx><img src="/projects/profile-13-0.jpeg" alt="Flowing abstract ribbon from the Grostage company profile" /></figure>
+      <figure className="rx-story-media" data-rx><img src="/projects/grostagelogo.webp" alt="Flowing abstract ribbon from the Grostage company profile" /></figure>
       <div className="rx-story-copy">
         <h2 data-rx>Technology with a<br /><span className="rx-accent">business purpose.</span></h2>
         <p data-rx style={{ '--d': 1 }}>We help businesses turn ideas, operational challenges and growth opportunities into practical digital solutions.</p>

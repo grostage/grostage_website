@@ -91,7 +91,7 @@ export default function MarketingHero() {
 
 
   return (
-    <section className="marketing-hero" data-nav-theme="dark" ref={root} aria-labelledby="marketing-title">
+    <section className="marketing-hero hero-stage" data-nav-theme="dark" ref={root} aria-labelledby="marketing-title">
       <div className="marketing-video-layer" aria-hidden="true">
         <video
           ref={video}
@@ -110,20 +110,20 @@ export default function MarketingHero() {
         <div className="marketing-video-blend" />
       </div>
 
-      <div className="marketing-hero-content">
-        <p className="marketing-eyebrow"><i aria-hidden="true" /> MARKETING SERVICES</p>
-        <h1 id="marketing-title" className="marketing-title">
-          <span className="marketing-title-line"><span>Creative that</span></span>
-          <span className="marketing-title-line marketing-title-accent"><span>drives growth.</span></span>
+      <div className="marketing-hero-content hero-stage-content">
+        <p className="marketing-eyebrow hero-stage-eyebrow"><i aria-hidden="true" /> MARKETING SERVICES</p>
+        <h1 id="marketing-title" className="marketing-title hero-stage-title">
+          <span className="marketing-title-line hero-stage-title-line"><span>Creative that</span></span>
+          <span className="marketing-title-line marketing-title-accent hero-stage-title-line hero-stage-title-accent"><span>drives growth.</span></span>
         </h1>
-        <p className="marketing-description">We connect bold ideas, standout content and smart campaigns to meaningful business growth.</p>
+        <p className="marketing-description hero-stage-description">We connect bold ideas, standout content and smart campaigns to meaningful business growth.</p>
       </div>
 
       <a className="stage-scroll" href="#marketing-possibilities">
         SCROLL TO DISCOVER <span aria-hidden="true">V</span>
       </a>
 
-      <div className="marketing-hero-actions">
+      <div className="marketing-hero-actions hero-stage-actions">
         <Magnetic>
           <Link className="stage-pill" href="/services" aria-label="Explore Grostage services">
             Explore Services <span aria-hidden="true">↗</span>
@@ -133,7 +133,7 @@ export default function MarketingHero() {
 
       {!videoUnavailable && <button
         type="button"
-        className="marketing-video-toggle"
+        className="marketing-video-toggle hero-stage-toggle"
         onClick={togglePlayback}
         aria-label={paused ? 'Play background video' : 'Pause background video'}
         aria-pressed={paused}

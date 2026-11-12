@@ -49,11 +49,12 @@ export function Team({ people }) {
     c.style.setProperty('--ty', ((e.clientY - b.top) / b.height - .5).toFixed(3));
   };
   const reset = e => { e.currentTarget.style.setProperty('--tx', 0); e.currentTarget.style.setProperty('--ty', 0); };
-  return <section className="rx rx-dark rx-team" data-nav-theme="dark">
-    <div className="rx-head" data-rx><h2>Shared purpose.<br /><span className="rx-accent">Different perspectives.</span></h2></div>
-    <div className="rx-team-grid">{people.map(([name, role, desc], i) => <article key={name} className="rx-person" tabIndex={0} onPointerMove={tilt} onPointerLeave={reset} data-rx style={{ '--d': i }}>
-      <span className="rx-mono" aria-hidden="true">{name.split(' ').map(w => w[0]).join('').slice(0, 2)}</span>
-      <div className="rx-person-meta"><h3>{name}</h3><p className="rx-role">{role}</p><p className="rx-desc">{desc}</p></div>
-    </article>)}</div>
-  </section>;
+  return null;
+  // return <section className="rx rx-dark rx-team" data-nav-theme="dark">
+  //   <div className="rx-head" data-rx><h2>Shared purpose.<br /><span className="rx-accent">Different perspectives.</span></h2></div>
+  //   <div className="rx-team-grid">{people.map(([name, role, desc], i) => <article key={name} className="rx-person" tabIndex={0} onPointerMove={tilt} onPointerLeave={reset} data-rx style={{ '--d': i }}>
+  //     <span className="rx-mono" aria-hidden="true">{name.split(' ').map(w => w[0]).join('').slice(0, 2)}</span>
+  //     <div className="rx-person-meta"><h3>{name}</h3><p className="rx-role">{role}</p><p className="rx-desc">{desc}</p></div>
+  //   </article>)}</div>
+  // </section>;
 }

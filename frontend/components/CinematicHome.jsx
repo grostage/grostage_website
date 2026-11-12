@@ -9,14 +9,17 @@ export function StageHero() {
   const root = useRef(null);
   useGSAP(() => {
     const mm = gsap.matchMedia();
+    let alive = true;
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      let alive = true;
+      const hero = root.current;
       const intro = gsap.timeline({ paused: true })
-        .from('.stage-title > span > span', { yPercent: 110, rotate: 3, stagger: .12, duration: 1.2, ease: 'power4.out' })
-        .from('.stage-meta,.stage-bottom', { opacity: 0, y: 16, duration: .8, stagger: .1 }, .45);
+        .fromTo(hero.querySelector('.hero-stage-eyebrow'), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .65, ease: 'power3.out' })
+        .fromTo(hero.querySelectorAll('.hero-stage-title-line > span'), { yPercent: 110 }, { yPercent: 0, duration: 1, stagger: .12, ease: 'power4.out' }, .12)
+        .fromTo(hero.querySelector('.hero-stage-description'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .7, ease: 'power3.out' }, .62)
+        .fromTo(hero.querySelector('.hero-stage-actions'), { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6, ease: 'power3.out' }, .78);
       ready().then(() => { if (alive) intro.play(); });
-      gsap.to('.stage-title', { yPercent: 25, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: 1 } });
-      return () => { alive = false; };
+      gsap.to(hero.querySelector('.hero-stage-title'), { yPercent: 25, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1 } });
+      return () => intro.kill();
     });
     mm.add('(pointer: fine) and (prefers-reduced-motion: no-preference)', () => {
       const el = root.current, art = el.querySelector('.stage-art');
@@ -27,14 +30,22 @@ export function StageHero() {
       el.addEventListener('pointermove', move); el.addEventListener('pointerleave', leave);
       return () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave); };
     });
-    return () => mm.revert();
+    return () => { alive = false; mm.revert(); };
   }, { scope: root });
-  return <section className="stage-hero" data-nav-theme="dark" ref={root}>
+  return <section className="stage-hero hero-stage" data-nav-theme="dark" ref={root}>
     <HeroVideo />
-    <div className="stage-meta"><span><i /> INDEPENDENT MINDS. CONNECTED THINKING.</span><span>STRATEGY / DESIGN / TECHNOLOGY</span></div>
-    <h1 className="stage-title"><span><span>Ideas beyond</span></span><span className="stage-title-last"><span>the ordinary<span className="stage-period">.</span></span></span></h1>
-    <div className="stage-bottom"><p>We turn ambition into digital experiences.<br />Thoughtfully designed. Intelligently built.</p><Magnetic><Link className="stage-pill" href="/work" data-cursor="Explore">Step into our work <span aria-hidden="true">↗</span></Link></Magnetic><a className="stage-scroll" href="#hx-about">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a></div>
-    <span className="stage-side" aria-hidden="true">GROSTAGE — YOUR NEXT CHAPTER</span>
+    <div className="hero-stage-content">
+      <p className="hero-stage-eyebrow"><i aria-hidden="true" /> INDEPENDENT MINDS. CONNECTED THINKING.</p>
+      <h1 className="stage-title hero-stage-title">
+        <span className="hero-stage-title-line"><span>Software that</span></span>
+        <span className="hero-stage-title-line hero-stage-title-accent"><span>transforms operations.</span></span>
+      </h1>
+      <p className="hero-stage-description">We replace fragmented processes with unified, custom-built digital systems designed for long-term operational excellence.</p>
+    </div>
+    <a className="stage-scroll" href="#hx-about">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a>
+    <div className="hero-stage-actions">
+      <Magnetic><Link className="stage-pill" href="/work" data-cursor="Explore">Step into our work <span aria-hidden="true">↗</span></Link></Magnetic>
+    </div>
   </section>;
 }
 

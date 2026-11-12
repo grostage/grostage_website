@@ -189,12 +189,10 @@
 .rx-quote-nav button.is-active{color:var(--rx-green)}
 .rx-quote-nav i{position:absolute;left:0;right:0;top:-1px;height:2px;background:var(--rx-green);transform:scaleX(0);transform-origin:left}
 .rx-quote-nav button.is-active i{animation:rx-bar 6s linear both}
-.rx-videos .video-grid{gap:24px}
-.rx-videos .video-frame{border-radius:18px;overflow:hidden}
-.rx-videos .video-frame button img{transition:transform 1s var(--rx-out),filter .6s}
-.rx-videos .play-icon{transition:transform .5s var(--rx-out),background .3s}
-.rx-videos .video-frame button:active{transform:scale(.99)}
-@media(hover:hover) and (pointer:fine){.rx-videos .video-frame button:hover img{transform:scale(1.05);filter:brightness(.8)}.rx-videos .video-frame button:hover .play-icon{transform:scale(1.15)}}
+.rx-videos .video-grid{grid-template-columns:repeat(2,minmax(0,357px));gap:clamp(28px,4vw,56px)}
+.rx-videos .video-frame{aspect-ratio:9/16;background:#090f10;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px -28px #090f1045}
+.rx-videos .video-frame iframe{display:block;width:100%;height:100%;border:0}
+@media(max-width:760px){.rx-videos .video-grid{grid-template-columns:minmax(0,357px);gap:36px}}
 
 /* ---------- Contact ---------- */
 .rx-contact{display:grid;grid-template-columns:1fr 1.15fr;padding:0;background:var(--rx-paper)}
@@ -366,35 +364,11 @@
 .sd-accent{position:absolute;top:0;left:-1px;right:-1px;height:clamp(28px,6vh,64px);background:var(--sd-accent)}
 .sd-block{position:absolute;top:clamp(28px,6vh,64px);bottom:0;left:-1px;right:-1px;background:var(--sd-to)}
 
-@media(min-width:901px){
-  .stage-hero{padding-bottom:clamp(110px,12vw,170px)!important}
-  .stage-hero .video-toggle{bottom:calc(clamp(110px,12vw,170px) + 4px)}
-}
-
 @media(max-width:900px){
   .sd-frame{display:none}
   .sd-col{left:calc(var(--i) * 25%);width:calc(25% + 2px);height:calc(6vh + var(--i) * 6vh)}
   .sd-accent{height:18px}.sd-block{top:18px}
   .stage-divider:not(.is-flipped) .sd-col:nth-child(n+5),.stage-divider.is-flipped .sd-col:nth-child(-n+2){display:none}
-
-  .stage-hero{
-    height:100vh!important;
-    height:100svh!important;
-    height:100dvh!important;
-    min-height:100vh!important;
-    min-height:100svh!important;
-    min-height:100dvh!important;
-    max-height:none!important;
-    padding-top:clamp(95px, 12vh, 120px)!important;
-    padding-bottom:clamp(45px, 7vh, 65px)!important;
-    display:flex!important;
-    flex-direction:column!important;
-    justify-content:space-between!important;
-    box-sizing:border-box!important;
-  }
-  .stage-hero .video-toggle{
-    bottom:clamp(45px, 7vh, 65px)!important;
-  }
 }
 
 /* Loading cover and page-change curtain: plain black */
@@ -406,7 +380,6 @@
 /* Keep the last row of each section clear of the stepped wipe (same total height). */
 .page-intro.rx-intro{padding-top:clamp(120px,12vw,160px)!important;padding-bottom:clamp(80px,10vw,150px)!important}
 .rx-intro-foot{padding-bottom:clamp(30px,4vw,50px)}
-.stage-hero{padding-bottom:clamp(110px,12vw,170px)!important}
 .project-theatre{padding-bottom:clamp(100px,11vw,160px)!important}
 .cs-hero-copy{bottom:clamp(110px,12vw,170px)}
 .ar-hero{padding-top:clamp(120px,13vw,170px);padding-bottom:clamp(100px,11vw,160px)}
@@ -414,9 +387,6 @@
 .dimensional-reel .reel-controls{bottom:clamp(100px,11vw,160px)!important}
 .dimensional-reel .reel-stage{top:46%!important}
 .dimensional-reel .reel-instruction{display:none}
-
-/* Hero pause control sits on the bottom row, clear of the seam zone */
-.stage-hero .video-toggle{bottom:calc(clamp(110px,12vw,170px) + 4px)}
 /* Client stories quote: animations wait until the section is in view. */
 .rx-quotes.is-armed:not(.is-in) .rx-quote blockquote span>span,.rx-quotes.is-armed:not(.is-in) .rx-quote figcaption,.rx-quotes.is-armed:not(.is-in) .rx-quote-nav i{animation-play-state:paused}
 

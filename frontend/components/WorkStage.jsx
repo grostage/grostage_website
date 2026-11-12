@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useState } from 'react';
 import Link from 'next/link';
-import { gsap, ScrollTrigger, useGSAP, ready } from '@/frontend/lib/gsap';
+import { gsap, ScrollTrigger, useGSAP } from '@/frontend/lib/gsap';
 import Magnetic from './Magnetic';
 
 const categories = ['All work', 'Digital products', 'Business systems', 'Digital growth'];
@@ -34,7 +34,6 @@ const trimWords = (text, n) => { const w = plain(text).split(/\s+/).filter(Boole
 
 /* ---------- Hero: cinematic landing matching the rest of the site ---------- */
 export function WorkHero({ works = [], count }) {
-  const root = useRef(null);
   const totalCount = count || works.length || 8;
   const dpCount = works.filter(w => groupOf(w) === 'Digital products').length || 4;
   const bsCount = works.filter(w => groupOf(w) === 'Business systems').length || 2;
@@ -52,22 +51,8 @@ export function WorkHero({ works = [], count }) {
   ];
   const marqueeItems = [...tickerList, ...tickerList, ...tickerList];
 
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const q = s => root.current.querySelectorAll(s);
-      const intro = gsap.timeline({ paused: true })
-        .fromTo(q('.rx-intro-label, .wk-hero-tags'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, 0)
-        .fromTo(q('.rx-line > span'), { yPercent: 110 }, { yPercent: 0, duration: 1.15, stagger: 0.1, ease: 'power4.out' }, 0.1)
-        .fromTo(q('.wk-foot-left > *, .wk-foot-right > *'), { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.85, stagger: 0.08, ease: 'power3.out' }, 0.45)
-        .fromTo(q('.rx-ticker'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.9, ease: 'power2.out' }, 0.7);
-      ready().then(() => intro.play());
-    });
-    return () => mm.revert();
-  }, { scope: root });
-
   return (
-    <section className="page-intro rx-intro wk-hero-intro" ref={root} data-nav-theme="dark">
+    <section className="page-intro rx-intro wk-hero-intro" data-nav-theme="dark">
       <div className="rx-intro-grid" aria-hidden="true" />
       <div className="wrap">
         <div className="wk-intro-meta">
@@ -90,7 +75,7 @@ export function WorkHero({ works = [], count }) {
 
         <h1 className="rx-intro-title">
           <span className="rx-line"><span>Every project.</span></span>
-          <span className="rx-line rx-accent"><span>is a stage.</span></span>
+          <span className="rx-line rx-accent"><span>Built to perform.</span></span>
         </h1>
 
         <div className="rx-intro-foot wk-hero-foot">
