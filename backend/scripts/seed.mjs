@@ -304,7 +304,7 @@ const products = [
 
 const footerSetting = {
   tagline: 'Digital products. Technology. Growth.',
-  email: 'info@grostage.com',
+  email: 'grostage@gmail.com',
   phone: '',
   address: '',
   links: [

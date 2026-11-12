@@ -1,7 +1,7 @@
 import { q } from '@/backend/lib/db';
 import { unstable_noStore as noStore } from 'next/cache';
 export const defaultFooter = {
-  tagline: 'Digital products. Technology. Growth.', email: 'info@grostage.com', phone: '', address: '',
+  tagline: 'Digital products. Technology. Growth.', email: 'grostage@gmail.com', phone: '', address: '',
   links: [
     { label: 'About Us', value: '/about' }, { label: 'Services', value: '/services' },
     { label: 'Our Work', value: '/work' }, { label: 'Our Products', value: '/products' }, { label: 'Blog', value: '/blog' },

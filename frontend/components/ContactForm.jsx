@@ -85,7 +85,7 @@ export default function ContactForm() {
       setStatus('Thank you. Your message is with us. We will be in touch soon.');
       setS({ name: '', email: '', title: '', message: '' });
     } catch {
-      setStatus('Your message could not be sent. Please try again or email info@grostage.com.');
+      setStatus('Your message could not be sent. Please try again or email grostage@gmail.com.');
     } finally {
       setPending(false);
     }

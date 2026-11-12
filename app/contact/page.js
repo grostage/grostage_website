@@ -19,8 +19,8 @@ export default function Contact() {
     <section className="rx rx-contact">
       <div className="rx-contact-side" data-nav-theme="dark">
         <p className="rx-kicker" data-rx>Say hello</p>
-        <a className="rx-email" href="mailto:info@grostage.com" data-rx>info@<br />grostage.com <span aria-hidden="true">↗</span></a>
-        <CopyEmail email="info@grostage.com" />
+        <a className="rx-email" href="mailto:grostage@gmail.com" data-rx>info@<br />grostage.com <span aria-hidden="true">↗</span></a>
+        <CopyEmail email="grostage@gmail.com" />
         <p className="rx-contact-note" data-rx>Good work starts with understanding your business. Tell us where you are and where you want to go.</p>
         <div className="rx-socials" data-rx><a href="https://linkedin.com/company/grostage" target="_blank" rel="noreferrer">LinkedIn <span aria-hidden="true">↗</span></a><a href="https://instagram.com/grostage_" target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a></div>
       </div>
