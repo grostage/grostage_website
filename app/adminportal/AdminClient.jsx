@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import MarketingMediaPanel from './MarketingMediaPanel';
+import { compressImageForUpload } from '@/frontend/lib/compress-image';
 
 const empty = { title: '', slug: '', category: '', url: '', excerpt: '', content: '', tags: '', image: '', published: true };
 const footerFields = [['tagline', 'Tagline'], ['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['copyright', 'Copyright text']];
@@ -79,25 +80,29 @@ export default function AdminClient() {
     event.target.value = '';
     if (!file) return;
 
-    // Immediately display local preview so user sees new image instantly
-    const localUrl = URL.createObjectURL(file);
-    setForm(current => ({ ...current, image: localUrl }));
     setUploading(true);
     setUploadError('');
 
+    let localUrl = '';
     try {
+      const preparedFile = await compressImageForUpload(file);
+      localUrl = URL.createObjectURL(preparedFile);
+      setForm(current => ({ ...current, image: localUrl }));
+
       const data = new FormData();
-      data.append('file', file);
+      data.append('file', preparedFile);
       const response = await fetch('/api/upload', { method: 'POST', body: data });
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
       if (response.ok && result.url) {
+        URL.revokeObjectURL(localUrl);
         setForm(current => ({ ...current, image: result.url }));
         setUploadError('');
       } else {
-        setUploadError(result.error || 'Upload to cloud failed. The local preview is shown, but please try uploading again.');
+        setUploadError(result.error || 'Image upload failed. The local preview is shown, please try uploading again.');
       }
     } catch (err) {
-      setUploadError('Upload failed: ' + (err.message || 'Network error'));
+      if (localUrl) URL.revokeObjectURL(localUrl);
+      setUploadError(err?.message || 'Upload failed. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -276,7 +281,7 @@ export default function AdminClient() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           onChange={upload}
           style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}
         />

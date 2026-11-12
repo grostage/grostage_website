@@ -1,7 +1,27 @@
 import { q } from '@/backend/lib/db';
 import { ensureContactsTable } from '@/backend/lib/contacts';
+import { checkRateLimit, getClientIp, isSameOrigin } from '@/backend/lib/security';
+
+const CONTACT_WINDOW_MS = 10 * 60 * 1000;
 
 export async function POST(req) {
+  if (!isSameOrigin(req)) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const limitCheck = checkRateLimit({
+    namespace: 'contact',
+    key: getClientIp(req),
+    limit: 5,
+    windowMs: CONTACT_WINDOW_MS,
+  });
+  if (!limitCheck.allowed) {
+    return Response.json(
+      { error: 'Too many messages sent. Please wait a few minutes and try again.' },
+      { status: 429, headers: { 'Retry-After': String(limitCheck.retryAfterSeconds) } }
+    );
+  }
+
   try {
     const body = await req.json();
     const name = String(body.name || '').trim();

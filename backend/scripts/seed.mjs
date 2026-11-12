@@ -1,6 +1,7 @@
 import pg from 'pg';
 import fs from 'fs';
 import crypto from 'node:crypto';
+import { getPgSslConfig } from '../lib/db.js';
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -21,7 +22,7 @@ for (const file of ['.env.local', '.env']) {
 
 const client = new pg.Client({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : undefined,
+  ssl: getPgSslConfig(),
 });
 
 const works = [
@@ -360,18 +361,22 @@ async function seed() {
     )
   `);
   if (await shouldSeedTable('seeded:admins', 'admins')) {
-    console.log('Seeding admin user...');
-    const adminEmail = (process.env.ADMIN_EMAIL || 'grostage@gmail.com').trim().toLowerCase();
-    const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
-    const hashedPassword = hashPassword(adminPassword);
+    const adminEmail = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+    const adminPassword = String(process.env.ADMIN_PASSWORD || '');
+    if (adminEmail && adminPassword) {
+      console.log('Seeding admin user...');
+      const hashedPassword = hashPassword(adminPassword);
 
-    await client.query(`
-      INSERT INTO admins(email, password_hash)
-      VALUES($1, $2)
-      ON CONFLICT(email) DO NOTHING
-    `, [adminEmail, hashedPassword]);
-    await markSeeded('seeded:admins');
-    console.log(`✓ Seeded admin user: ${adminEmail}`);
+      await client.query(`
+        INSERT INTO admins(email, password_hash)
+        VALUES($1, $2)
+        ON CONFLICT(email) DO NOTHING
+      `, [adminEmail, hashedPassword]);
+      await markSeeded('seeded:admins');
+      console.log(`✓ Seeded admin user: ${adminEmail}`);
+    } else {
+      console.log('↷ Skipped admin user (set ADMIN_EMAIL and ADMIN_PASSWORD to bootstrap initial admin)');
+    }
   } else {
     console.log('↷ Skipped admin user (existing admin preserved)');
   }

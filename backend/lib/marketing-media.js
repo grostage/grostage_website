@@ -1,13 +1,25 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { q } from '@/backend/lib/db';
-import { marketingMediaItems, marketingMediaById, isValidCloudinaryImageUrl } from './marketing-media-config';
+import {
+  marketingMediaItems,
+  marketingMediaById,
+  isValidCloudinaryImageUrl,
+  isValidLocalUploadUrl,
+  isValidMarketingImageUrl,
+} from './marketing-media-config';
 
-export { marketingMediaItems, marketingMediaById, isValidCloudinaryImageUrl };
+export {
+  marketingMediaItems,
+  marketingMediaById,
+  isValidCloudinaryImageUrl,
+  isValidLocalUploadUrl,
+  isValidMarketingImageUrl,
+};
 
 function validOverrides(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
   return Object.fromEntries(Object.entries(value).filter(([id, url]) =>
-    Boolean(marketingMediaById[id]) && isValidCloudinaryImageUrl(url)));
+    Boolean(marketingMediaById[id]) && isValidMarketingImageUrl(url)));
 }
 
 export async function getMarketingMedia() {

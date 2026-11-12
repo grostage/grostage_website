@@ -1,29 +1,113 @@
-import { v2 as cloudinary } from 'cloudinary'; import { isAdmin } from '@/backend/lib/auth';
-cloudinary.config({ cloud_name: process.env.CLOUDINARY_CLOUD_NAME, api_key: process.env.CLOUDINARY_API_KEY, api_secret: process.env.CLOUDINARY_API_SECRET });
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-const signatures = {
-  'image/jpeg': bytes => bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff,
-  'image/png': bytes => bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
-  'image/webp': bytes => bytes.length >= 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP',
-};
+import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { Readable } from 'node:stream';
+import multer from 'multer';
+import sharp from 'sharp';
+import { isAdmin } from '@/backend/lib/auth';
+import { isSameOrigin } from '@/backend/lib/security';
+import {
+  ALLOWED_IMAGE_MIME_TYPES,
+  MAX_UPLOAD_BYTES,
+  buildStoredFilename,
+  ensureUploadsDir,
+  hasAllowedImageSignature,
+} from '@/backend/lib/uploads';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+function runMulterUpload(req, uploadsDir) {
+  const storage = multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, uploadsDir),
+    filename: (_req, _file, cb) => cb(null, `.tmp-${crypto.randomUUID()}`),
+  });
+
+  const uploader = multer({
+    storage,
+    limits: { fileSize: MAX_UPLOAD_BYTES, files: 1, fields: 8 },
+    fileFilter: (_req, file, cb) => {
+      if (!ALLOWED_IMAGE_MIME_TYPES.has(file.mimetype)) {
+        const err = new Error('Upload a valid JPEG, PNG, or WebP image.');
+        err.statusCode = 400;
+        return cb(err);
+      }
+      cb(null, true);
+    },
+  }).single('file');
+
+  return new Promise((resolve, reject) => {
+    const nodeReq = Readable.fromWeb(req.body);
+    nodeReq.headers = Object.fromEntries(req.headers.entries());
+    nodeReq.method = req.method;
+    nodeReq.url = req.url;
+
+    uploader(nodeReq, {}, err => {
+      if (err) {
+        if (nodeReq.file?.path) {
+          fs.unlink(nodeReq.file.path).catch(() => {});
+        }
+        return reject(err);
+      }
+      resolve(nodeReq.file || null);
+    });
+  });
+}
 
 export async function POST(req) {
+  if (!isSameOrigin(req)) return Response.json({ error: 'Forbidden' }, { status: 403 });
   if (!(await isAdmin())) return Response.json({}, { status: 401 });
+
   const contentLength = Number(req.headers.get('content-length') || 0);
-  if (contentLength > MAX_IMAGE_BYTES + 64 * 1024) return Response.json({ error: 'Image must be 5 MB or smaller.' }, { status: 413 });
-  let file;
-  try { file = (await req.formData()).get('file'); } catch { return Response.json({ error: 'Invalid image upload.' }, { status: 400 }); }
-  if (!file || typeof file.arrayBuffer !== 'function') return Response.json({ error: 'No image file was provided.' }, { status: 400 });
-  if (file.size > MAX_IMAGE_BYTES) return Response.json({ error: 'Image must be 5 MB or smaller.' }, { status: 413 });
-  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) return Response.json({ error: 'Image uploads are not configured' }, { status: 503 });
-  const buf = Buffer.from(await file.arrayBuffer());
-  const signatureMatches = signatures[file.type];
-  if (!signatureMatches || !signatureMatches(buf)) return Response.json({ error: 'Upload a valid JPEG, PNG, or WebP image.' }, { status: 400 });
+  if (contentLength > MAX_UPLOAD_BYTES + 256 * 1024) {
+    return Response.json({ error: 'Image must be 10 MB or smaller.' }, { status: 413 });
+  }
+
+  const contentType = req.headers.get('content-type') || '';
+  if (!contentType.toLowerCase().includes('multipart/form-data') || !req.body) {
+    return Response.json({ error: 'Invalid image upload.' }, { status: 400 });
+  }
+
+  const uploadsDir = await ensureUploadsDir();
+  let tempFile = null;
+
   try {
-    const url = await new Promise((res, rej) => cloudinary.uploader.upload_stream({ folder: 'grostage', resource_type: 'image', allowed_formats: ['jpg', 'jpeg', 'png', 'webp'], max_bytes: MAX_IMAGE_BYTES }, (e, r) => e ? rej(e) : res(r?.secure_url)).end(buf));
-    if (!url) return Response.json({ error: 'Image upload failed. Please try again.' }, { status: 502 });
-    return Response.json({ url });
-  } catch {
-    return Response.json({ error: 'Image upload failed. Please try again.' }, { status: 502 });
+    tempFile = await runMulterUpload(req, uploadsDir);
+    if (!tempFile) {
+      return Response.json({ error: 'No image file was provided.' }, { status: 400 });
+    }
+
+    const rawBuffer = await fs.readFile(tempFile.path);
+    if (rawBuffer.byteLength > MAX_UPLOAD_BYTES) {
+      return Response.json({ error: 'Image must be 10 MB or smaller.' }, { status: 413 });
+    }
+
+    if (!hasAllowedImageSignature(rawBuffer, tempFile.mimetype)) {
+      return Response.json({ error: 'Upload a valid JPEG, PNG, or WebP image.' }, { status: 400 });
+    }
+
+    const finalFilename = buildStoredFilename(tempFile.originalname);
+    const finalPath = path.join(uploadsDir, finalFilename);
+
+    await sharp(rawBuffer)
+      .rotate()
+      .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 84, effort: 4 })
+      .toFile(finalPath);
+
+    return Response.json({ url: `/uploads/${finalFilename}` });
+  } catch (err) {
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+      return Response.json({ error: 'Image must be 10 MB or smaller.' }, { status: 413 });
+    }
+    if (err instanceof multer.MulterError || err?.statusCode === 400) {
+      return Response.json({ error: err.message || 'Upload a valid JPEG, PNG, or WebP image.' }, { status: 400 });
+    }
+    console.error('Server image upload failed:', err);
+    return Response.json({ error: 'Image upload failed. Please try again.' }, { status: 500 });
+  } finally {
+    if (tempFile?.path) {
+      await fs.unlink(tempFile.path).catch(() => {});
+    }
   }
 }

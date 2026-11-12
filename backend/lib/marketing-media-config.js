@@ -24,3 +24,11 @@ export function isValidCloudinaryImageUrl(value) {
     return false;
   }
 }
+
+export function isValidLocalUploadUrl(value) {
+  return typeof value === 'string' && /^\/uploads\/[a-z0-9][a-z0-9._-]{0,120}\.(?:webp|jpe?g|png)$/i.test(value);
+}
+
+export function isValidMarketingImageUrl(value) {
+  return isValidCloudinaryImageUrl(value) || isValidLocalUploadUrl(value);
+}

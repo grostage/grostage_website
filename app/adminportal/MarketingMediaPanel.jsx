@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { marketingMediaItems } from '@/backend/lib/marketing-media-config';
+import { MAX_UPLOAD_BYTES, compressImageForUpload } from '@/frontend/lib/compress-image';
 
 const MarketingMediaPanel = forwardRef(function MarketingMediaPanel(_, ref) {
   const defaults = useMemo(() => Object.fromEntries(marketingMediaItems.map(item => [item.id, item.defaultUrl])), []);
@@ -59,7 +60,7 @@ const MarketingMediaPanel = forwardRef(function MarketingMediaPanel(_, ref) {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { setMessage(`${item.label}: image must be 5 MB or smaller.`); return; }
+    if (file.size > MAX_UPLOAD_BYTES) { setMessage(`${item.label}: image must be 10 MB or smaller.`); return; }
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setMessage(`${item.label}: choose a JPEG, PNG, or WebP image.`); return; }
     if (drafts[item.id] && !window.confirm('Discard the previous unsaved selection for this image?')) return;
     const previewUrl = URL.createObjectURL(file);
@@ -76,12 +77,13 @@ const MarketingMediaPanel = forwardRef(function MarketingMediaPanel(_, ref) {
     const draft = drafts[item.id];
     if (!draft || busy[item.id]) return;
     setBusy(current => ({ ...current, [item.id]: true }));
-    setMessage(`${item.label}: uploading image…`);
+    setMessage(`${item.label}: compressing & uploading image…`);
     try {
       let uploadedUrl = draft.uploadedUrl;
       if (!uploadedUrl) {
+        const preparedFile = await compressImageForUpload(draft.file);
         const formData = new FormData();
-        formData.append('file', draft.file);
+        formData.append('file', preparedFile);
         const uploadResponse = await fetch('/api/upload', { method: 'POST', body: formData });
         const uploadResult = await uploadResponse.json().catch(() => ({}));
         if (!uploadResponse.ok || !uploadResult.url) throw new Error(uploadResult.error || 'Image upload failed.');
