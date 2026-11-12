@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProduct, getProducts } from '@/backend/lib/content';
-import { chapters, safeProductUrl, formatUrlLabel } from '@/frontend/lib/render';
+import { chapters, safeDocumentUrl, safeProductUrl, formatUrlLabel } from '@/frontend/lib/render';
 import StageDivider from '@/frontend/components/StageDivider';
 import CTA from '@/frontend/components/CTA';
 import ReadingProgress from '@/frontend/components/ReadingProgress';
@@ -38,6 +38,7 @@ export default async function ProductDetail({ params }) {
   const { intro, list } = chapters(product.content);
   const number = String(index + 1).padStart(2, '0');
   const externalUrl = safeProductUrl(product.url);
+  const documentUrl = safeDocumentUrl(product.document);
 
   return (
     <main id="main-content" className="cs">
@@ -58,11 +59,23 @@ export default async function ProductDetail({ params }) {
           <div data-rx style={{ '--d': 1 }}><dt>Core capabilities</dt><dd>{product.tags.join(', ')}</dd></div>
           <div data-rx style={{ '--d': 2 }}><dt>Product</dt><dd>{number} of {String(products.length).padStart(2, '0')} · Built by Grostage</dd></div>
         </dl>
-        {externalUrl && (
+        {(externalUrl || documentUrl) && (
           <div className="cs-product-cta" data-rx style={{ '--d': 3 }}>
-            <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="rx-product-btn">
-              Visit {formatUrlLabel(externalUrl)} <span aria-hidden="true">↗</span>
-            </a>
+            {externalUrl && (
+              <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="rx-product-btn">
+                Visit {formatUrlLabel(externalUrl)} <span aria-hidden="true">↗</span>
+              </a>
+            )}
+            {documentUrl && (
+              <>
+                <a href={documentUrl} target="_blank" rel="noopener noreferrer" className="rx-product-btn rx-product-btn-ghost">
+                  Product Brochure (PDF) <span aria-hidden="true">↗</span>
+                </a>
+                <a href={documentUrl} download className="rx-product-demo">
+                  Download PDF <span aria-hidden="true">↓</span>
+                </a>
+              </>
+            )}
           </div>
         )}
       </section>

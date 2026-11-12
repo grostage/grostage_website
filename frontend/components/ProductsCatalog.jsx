@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Magnetic from './Magnetic';
-import { chapters, safeProductUrl, formatUrlLabel } from '@/frontend/lib/render';
+import { chapters, safeDocumentUrl, safeProductUrl, formatUrlLabel } from '@/frontend/lib/render';
 
 export default function ProductsCatalog({ products = [] }) {
   return (
@@ -24,6 +24,7 @@ export default function ProductsCatalog({ products = [] }) {
           const num = String(index + 1).padStart(2, '0');
           const { list } = chapters(product.content);
           const externalUrl = safeProductUrl(product.url);
+          const documentUrl = safeDocumentUrl(product.document);
 
           return (
             <article
@@ -84,6 +85,16 @@ export default function ProductsCatalog({ products = [] }) {
                       className="rx-product-demo"
                     >
                       Visit {formatUrlLabel(externalUrl)} <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                  {documentUrl && (
+                    <a
+                      href={documentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rx-product-demo"
+                    >
+                      Brochure (PDF) <span aria-hidden="true">↗</span>
                     </a>
                   )}
                 </div>

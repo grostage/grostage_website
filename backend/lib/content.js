@@ -28,6 +28,7 @@ export const products = [
     title: 'HallSpot',
     category: 'Convention Center ERP / Internal Software',
     url: 'https://hallspot.in/',
+    document: '/docs/hallspot-brochure.pdf',
     image: '/projects/hallspot.jpg',
     imageAlt: 'HallSpot convention center booking and accounting platform interface by Grostage',
     representative: false,
@@ -49,7 +50,7 @@ export const products = [
   },
 ];
 
-const workColumns = `id,title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,url,published,created_at`;
+const workColumns = `id,title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,url,document,published,created_at`;
 const structuredTables = { works, products };
 const tableReadyPromises = {};
 
@@ -62,6 +63,7 @@ export function normalizeWork(row) {
     imageAlt: row.image_alt || row.imageAlt || '',
     representative: Boolean(row.representative),
     url: String(row.url || '').trim(),
+    document: String(row.document || '').trim(),
   };
 }
 export const normalizeProduct = normalizeWork;
@@ -107,22 +109,37 @@ async function ensureStructuredTable(table) {
         gallery TEXT DEFAULT '',
         tags TEXT DEFAULT '',
         url TEXT DEFAULT '',
+        document TEXT DEFAULT '',
         published BOOLEAN DEFAULT true,
         created_at TIMESTAMPTZ DEFAULT now()
       )`);
       await q(`ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS url TEXT DEFAULT ''`);
       await q(`ALTER TABLE ${table} ALTER COLUMN url SET DEFAULT ''`);
       await q(`UPDATE ${table} SET url = '' WHERE url IS NULL`);
+      await q(`ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS document TEXT DEFAULT ''`);
+      await q(`ALTER TABLE ${table} ALTER COLUMN document SET DEFAULT ''`);
+      await q(`UPDATE ${table} SET document = '' WHERE document IS NULL`);
       await runOneTimeSeed(table, async () => {
         for (const item of seedRows) {
-          await q(`INSERT INTO ${table}(title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,url,published)
-            VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true)
+          await q(`INSERT INTO ${table}(title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,url,document,published)
+            VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,true)
             ON CONFLICT(slug) DO NOTHING`, [
             item.title, item.slug, item.category, item.excerpt, item.content, item.image,
-            item.imageAlt || '', Boolean(item.representative), item.gallery || '', item.tags.join(', '), item.url || ''
+            item.imageAlt || '', Boolean(item.representative), item.gallery || '', item.tags.join(', '), item.url || '', item.document || ''
           ]);
         }
       });
+      if (table === 'products') {
+        const docMarker = 'backfilled:hallspot-document';
+        const docMarked = await q(`SELECT 1 FROM settings WHERE key = $1 LIMIT 1`, [docMarker]);
+        if (!docMarked.length) {
+          await q(
+            `UPDATE products SET document = $1 WHERE slug = 'hallspot' AND (document IS NULL OR document = '')`,
+            ['/docs/hallspot-brochure.pdf']
+          );
+          await markTableSeeded(docMarker);
+        }
+      }
     })().catch(error => { tableReadyPromises[table] = null; throw error; });
   }
   return tableReadyPromises[table];

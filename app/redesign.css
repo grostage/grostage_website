@@ -189,10 +189,10 @@
 .rx-quote-nav button.is-active{color:var(--rx-green)}
 .rx-quote-nav i{position:absolute;left:0;right:0;top:-1px;height:2px;background:var(--rx-green);transform:scaleX(0);transform-origin:left}
 .rx-quote-nav button.is-active i{animation:rx-bar 6s linear both}
-.rx-videos .video-grid{grid-template-columns:repeat(2,minmax(0,357px));gap:clamp(28px,4vw,56px)}
+.rx-videos .video-grid{grid-template-columns:repeat(3,minmax(0,357px));justify-content:space-between;gap:clamp(20px,3vw,48px)}
 .rx-videos .video-frame{aspect-ratio:9/16;background:#090f10;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px -28px #090f1045}
 .rx-videos .video-frame iframe{display:block;width:100%;height:100%;border:0}
-@media(max-width:760px){.rx-videos .video-grid{grid-template-columns:minmax(0,357px);gap:36px}}
+@media(max-width:760px){.rx-videos .video-grid{grid-template-columns:minmax(0,357px);justify-content:center;gap:36px}}
 
 /* ---------- Contact ---------- */
 .rx-contact{display:grid;grid-template-columns:1fr 1.15fr;padding:0;background:var(--rx-paper)}
@@ -423,12 +423,13 @@
 .rx-product-btn{display:inline-flex;align-items:center;gap:16px;padding:16px 26px;border-radius:100px;background:var(--rx-teal);color:var(--rx-paper);font-size:14px;font-weight:500;transition:background .3s,transform .16s var(--rx-out)}
 .rx-product-btn span{transition:transform .45s var(--rx-out)}
 .rx-product-btn:active{transform:scale(.97)}
-@media(hover:hover) and (pointer:fine){.rx-product-btn:hover{background:var(--rx-black)}.rx-product-btn:hover span{transform:translateX(4px)}}
+.rx-product-btn-ghost{background:transparent;color:var(--rx-teal);border:1px solid #10485040}
+@media(hover:hover) and (pointer:fine){.rx-product-btn:hover{background:var(--rx-black);color:var(--rx-paper);border-color:var(--rx-black)}.rx-product-btn:hover span{transform:translateX(4px)}}
 .rx-product-demo{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--rx-teal);padding-bottom:4px;border-bottom:1px solid #10485040;transition:color .3s,border-color .3s}
 .rx-product-demo:hover{color:var(--rx-black);border-color:var(--rx-black)}
 .rx-products-empty{padding:48px 0;font-size:16px;color:var(--rx-muted-l)}
 .cs-product-overview .cs-statement{font-size:clamp(28px,3.6vw,52px);line-height:1.15;max-width:26ch}
-.cs-product-cta{margin-top:34px}
+.cs-product-cta{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:34px}
 @media(max-width:900px){
   .rx-products-head,.rx-product-card{grid-template-columns:1fr}
   .rx-products-lead{justify-self:start}

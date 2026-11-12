@@ -23,15 +23,16 @@ export async function GET(_, { params }) {
 
   try {
     const fileBuffer = await fs.readFile(resolved);
-    return new Response(fileBuffer, {
-      status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Content-Length': String(fileBuffer.byteLength),
-        'Cache-Control': 'public, max-age=31536000, immutable',
-        'X-Content-Type-Options': 'nosniff',
-      },
-    });
+    const headers = {
+      'Content-Type': contentType,
+      'Content-Length': String(fileBuffer.byteLength),
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'X-Content-Type-Options': 'nosniff',
+    };
+    if (contentType === 'application/pdf') {
+      headers['Content-Disposition'] = 'inline';
+    }
+    return new Response(fileBuffer, { status: 200, headers });
   } catch (err) {
     if (err?.code === 'ENOENT') {
       return new Response('Not found', { status: 404 });

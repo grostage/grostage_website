@@ -26,3 +26,13 @@ export function safeProductUrl(url = '') {
 export function formatUrlLabel(url = '') {
   return String(url || '').replace(/^https?:\/\//i, '').replace(/\/+$/, '');
 }
+
+/** Validates a stored document path or HTTPS/HTTP URL, returning '' if unsafe or empty. */
+export function safeDocumentUrl(url = '') {
+  const trimmed = String(url || '').trim();
+  if (!trimmed || /[\u0000-\u001f\u007f]/.test(trimmed)) return '';
+  if (trimmed.startsWith('/')) {
+    return trimmed.startsWith('//') || trimmed.startsWith('/\\') ? '' : trimmed;
+  }
+  return /^https?:\/\//i.test(trimmed) ? trimmed : '';
+}

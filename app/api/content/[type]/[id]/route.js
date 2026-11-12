@@ -1,7 +1,7 @@
 import { q } from '@/backend/lib/db';
 import { isAdmin } from '@/backend/lib/auth';
 import { ensureWorksTable, ensureProductsTable } from '@/backend/lib/content';
-import { isSameOrigin, sanitizeHref, sanitizeImageSrc, slugifySafe } from '@/backend/lib/security';
+import { isSameOrigin, sanitizeDocumentSrc, sanitizeHref, sanitizeImageSrc, slugifySafe } from '@/backend/lib/security';
 
 const ok = t => ['posts', 'pages', 'works', 'products'].includes(t);
 const ensureByType = { works: ensureWorksTable, products: ensureProductsTable };
@@ -21,13 +21,16 @@ export async function PUT(req, { params }) {
   const url = ensureByType[type] ? sanitizeHref(b.url, { allowRelative: false, allowBareDomain: true }) : '';
   if (url === null) return Response.json({ error: 'Product website URL must use https:// or http://' }, { status: 400 });
 
+  const document = type === 'products' ? sanitizeDocumentSrc(b.document) : '';
+  if (document === null) return Response.json({ error: 'Provide a valid HTTPS PDF URL or /path (wait for upload to finish).' }, { status: 400 });
+
   try {
     if (ensureByType[type]) {
       await ensureByType[type]();
       const tags = Array.isArray(b.tags) ? b.tags.join(', ') : String(b.tags || '');
       const r = await q(
-        `UPDATE ${type} SET title=$1,slug=$2,category=$3,excerpt=$4,content=$5,image=$6,tags=$7,url=$8,published=true WHERE id=$9 RETURNING *`,
-        [title, slug, String(b.category || ''), String(b.excerpt || ''), String(b.content || ''), image, tags, url, id]
+        `UPDATE ${type} SET title=$1,slug=$2,category=$3,excerpt=$4,content=$5,image=$6,tags=$7,url=$8,document=$9,published=true WHERE id=$10 RETURNING *`,
+        [title, slug, String(b.category || ''), String(b.excerpt || ''), String(b.content || ''), image, tags, url, document, id]
       );
       if (!r.length) return Response.json({ error: 'Item not found' }, { status: 404 });
       return Response.json(r[0]);

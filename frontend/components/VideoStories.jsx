@@ -13,6 +13,13 @@ const videos = [
     iframeTitle: 'DataCorrel Client Testimonial Grostage',
     src: 'https://www.youtube.com/embed/dxEVUtyKtHY',
   },
+  {
+    id: '2RTRORtovUY',
+    client: 'NURTR HR SOLUTIONS',
+    title: 'Archana — Founder, Nurtr HR Solutions',
+    iframeTitle: 'Archana Client Review Grostage',
+    src: 'https://www.youtube.com/embed/2RTRORtovUY',
+  },
 ];
 
 export default function VideoStories() {

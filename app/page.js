@@ -27,11 +27,11 @@ export default async function Home() {
     <StageHero />
     <StageDivider from="#050a0b" to="#f0f3ef" />
     <section className="stage-manifesto" id="hx-about" data-nav-theme="light">
-      <p className="stage-label">01 / A DIFFERENT PERSPECTIVE</p>
+      <p className="stage-label">A DIFFERENT PERSPECTIVE</p>
       <div><TextFill className="stage-statement" text="Great ideas deserve to be experienced. We connect design, technology and AI to move your business into its next stage." previews={wordPreviews} /><div className="manifesto-bottom"><p>From the first spark to the systems behind it.<br />One team, bringing the whole picture together.</p><Link className="stage-text-link" href="/about">Meet Grostage <span>↗</span></Link></div></div>
     </section>
     <StageDivider from="#f0f3ef" to="#060908" flip />
-    <CinematicReel works={works.slice(0, 4)} more="/work" />
+    <CinematicReel works={works.slice(0, 10)} more="/work" />
     <StageDivider from="#060908" to="#e8eeea" />
     <div id="capabilities" data-nav-theme="light"><ExperienceServices services={services} /></div>
     <StageDivider from="#e8eeea" to="#090f10" flip />

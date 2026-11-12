@@ -45,7 +45,7 @@ export function ExperienceServices({ services }) {
   const preview = i => { if (matchMedia('(hover: hover) and (pointer: fine)').matches && i !== active) open(i); };
   const s = services[shown];
   return <section className="experience-services">
-    <div className="experience-section-heading"><p className="studio-label">01 / OUR CAPABILITIES</p><h2>Different disciplines.<br /><span className="serif">One shared ambition.</span></h2><p>From the first question to the next big opportunity. The right expertise, working together.</p>
+    <div className="experience-section-heading"><p className="studio-label">OUR aCAPABILITIES</p><h2>Different disciplines.<br /><span className="serif">One shared ambition.</span></h2><p>From the first question to the next big opportunity. The right expertise, working together.</p>
       <Link href={`/services#${s.slug}`} className="capability-stage" aria-label={`Explore ${s.title}`} data-cursor="Explore">
         <div className="capability-stage-top"><span>0{shown + 1}</span><span>{s.title}</span></div>
         <ServiceArt key={s.slug} slug={s.slug} />

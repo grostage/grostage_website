@@ -287,6 +287,7 @@ const products = [
     title: 'HallSpot',
     category: 'Convention Center ERP / Internal Software',
     url: 'https://hallspot.in/',
+    document: '/docs/hallspot-brochure.pdf',
     image: '/projects/hallspot.jpg',
     image_alt: 'HallSpot convention center booking and accounting platform interface by Grostage',
     representative: false,
@@ -434,21 +435,23 @@ async function seed() {
       gallery TEXT DEFAULT '',
       tags TEXT DEFAULT '',
       url TEXT DEFAULT '',
+      document TEXT DEFAULT '',
       published BOOLEAN DEFAULT true,
       created_at TIMESTAMPTZ DEFAULT now()
     )
   `);
   await client.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS url TEXT DEFAULT ''`);
+  await client.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS document TEXT DEFAULT ''`);
   if (await shouldSeedTable('seeded:products', 'products')) {
     console.log('Seeding products...');
     for (const pr of products) {
       await client.query(`
-        INSERT INTO products(title, slug, category, excerpt, content, image, image_alt, representative, gallery, tags, url, published)
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true)
+        INSERT INTO products(title, slug, category, excerpt, content, image, image_alt, representative, gallery, tags, url, document, published)
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, true)
         ON CONFLICT(slug) DO NOTHING
       `, [
         pr.title, pr.slug, pr.category, pr.excerpt, pr.content, pr.image,
-        pr.image_alt || '', Boolean(pr.representative), pr.gallery || '', pr.tags, pr.url || ''
+        pr.image_alt || '', Boolean(pr.representative), pr.gallery || '', pr.tags, pr.url || '', pr.document || ''
       ]);
     }
     await markSeeded('seeded:products');

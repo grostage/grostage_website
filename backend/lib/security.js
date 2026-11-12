@@ -102,6 +102,9 @@ export function sanitizeImageSrc(raw) {
   return sanitizeHref(raw, { allowRelative: true, allowBareDomain: false });
 }
 
+/** Validates uploaded document paths/URLs stored in CMS records; rejects blob: or unsafe schemes. */
+export const sanitizeDocumentSrc = sanitizeImageSrc;
+
 /** Validates plain contact email strings without query/header injection characters. */
 export function sanitizeEmail(raw) {
   const email = String(raw || '').trim().toLowerCase();

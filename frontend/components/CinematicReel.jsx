@@ -55,7 +55,7 @@ export default function CinematicReel({ works, more }) {
   return <section ref={root} data-nav-theme="dark" className="reel-section dimensional-reel" aria-label="Selected work film reel" tabIndex={0}
     onKeyDown={e => { if (['ArrowLeft', 'ArrowRight'].includes(e.key)) { e.preventDefault(); go(e.key === 'ArrowRight' ? 1 : -1); } }}>
     <div className="reel-backdrop" aria-hidden="true"><span className="reel-light" /><i /><i /><i /></div>
-    <div className="reel-heading"><p className="eyebrow">IDEAS MADE REAL / SELECTED WORK</p><h2>Another <span className="serif">dimension.</span></h2></div>
+    <div className="reel-heading"><p className="eyebrow">IDEAS MADE REAL</p><h2>Selected <span className="serif">works.</span></h2></div>
     <div className="reel-stage"
       onPointerDown={e => { swipe.current = e.pointerType === 'mouse' ? null : e.clientX; }}
       onPointerUp={e => { if (swipe.current == null) return; const dx = e.clientX - swipe.current; swipe.current = null; if (Math.abs(dx) > 40) { moved.current = true; go(dx < 0 ? 1 : -1); } }}>

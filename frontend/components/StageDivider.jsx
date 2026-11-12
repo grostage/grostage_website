@@ -20,13 +20,16 @@ export default function StageDivider({ from = '#060908', to = '#f0f3ef', accent 
       const trigger = triggerRef?.current || el;
       const tl = gsap.timeline({
         onUpdate: function () { onTimelineProgress?.(this.progress()); },
-        scrollTrigger: { trigger, start: scrollStart || (phone ? 'top bottom' : 'top bottom+=10%'), end: scrollEnd || (phone ? 'top 45%' : 'top 25%'), scrub: .35, refreshPriority: scrollRefreshPriority, invalidateOnRefresh: true,
+        scrollTrigger: { trigger, start: scrollStart || 'top bottom-=4px', end: scrollEnd || (phone ? 'top 45%' : 'top 25%'), scrub: .35, refreshPriority: scrollRefreshPriority, invalidateOnRefresh: true,
         onUpdate: self => onProgress?.(self.progress),
         onRefresh: self => onProgress?.(self.progress),
       } });
       // The frame closes in first, then the stairs climb one after another.
       // Phones skip the frame: on a narrow screen it reads as a border around the page.
-      if (!phone) tl.fromTo(frame, { '--sd-edge': '0px' }, { '--sd-edge': Math.round(Math.min(24, Math.max(14, innerWidth * .014))) + 'px', ease: 'none', duration: .45 }, 0);
+      if (!phone) {
+        gsap.set(frame, { '--sd-edge': '0px' });
+        tl.fromTo(frame, { '--sd-edge': '0px' }, { '--sd-edge': Math.round(Math.min(24, Math.max(14, innerWidth * .014))) + 'px', ease: 'none', duration: .45 }, 0);
+      }
       steps.forEach(col => {
         // The tallest step leads, so the staircase climbs toward its high side.
         const rank = steps.map(c => +c.style.getPropertyValue('--i')), i = +col.style.getPropertyValue('--i');

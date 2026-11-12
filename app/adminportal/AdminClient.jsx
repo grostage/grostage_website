@@ -2,9 +2,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import MarketingMediaPanel from './MarketingMediaPanel';
-import { compressImageForUpload } from '@/frontend/lib/compress-image';
+import { compressImageForUpload, MAX_UPLOAD_BYTES } from '@/frontend/lib/compress-image';
+import { safeDocumentUrl } from '@/frontend/lib/render';
 
-const empty = { title: '', slug: '', category: '', url: '', excerpt: '', content: '', tags: '', image: '', published: true };
+const empty = { title: '', slug: '', category: '', url: '', document: '', excerpt: '', content: '', tags: '', image: '', published: true };
 const footerFields = [['tagline', 'Tagline'], ['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['copyright', 'Copyright text']];
 const socialFields = [['linkedin', 'LinkedIn URL', 'LinkedIn'], ['instagram', 'Instagram URL', 'Instagram'], ['facebook', 'Facebook URL', 'Facebook'], ['youtube', 'YouTube URL', 'YouTube'], ['twitter', 'Twitter / X URL', 'Twitter / X']];
 const socialAliases = { linkedin: 'linkedin', instagram: 'instagram', facebook: 'facebook', youtube: 'youtube', twitter: 'twitter', twitterx: 'twitter', x: 'twitter' };
@@ -29,7 +30,10 @@ export default function AdminClient() {
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [docUploading, setDocUploading] = useState(false);
+  const [docUploadError, setDocUploadError] = useState('');
   const fileInputRef = useRef(null);
+  const docInputRef = useRef(null);
   const marketingMediaRef = useRef(null);
   const router = useRouter();
 
@@ -47,12 +51,15 @@ export default function AdminClient() {
     setMessage('');
     setUploadError('');
     setUploading(false);
+    setDocUploadError('');
+    setDocUploading(false);
     if (tab !== 'marketing-media') load();
   }, [tab]);
 
   const save = async () => {
-    if (uploading) {
-      setUploadError('Please wait for image upload to complete.');
+    if (uploading || docUploading) {
+      if (uploading) setUploadError('Please wait for image upload to complete.');
+      if (docUploading) setDocUploadError('Please wait for document upload to complete.');
       return;
     }
     const response = await fetch(`/api/content/${tab}${form.id ? `/${form.id}` : ''}`, {
@@ -108,6 +115,41 @@ export default function AdminClient() {
     }
   };
 
+  const uploadDocument = async event => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
+    if (!isPdf) {
+      setDocUploadError('Upload a valid PDF document.');
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setDocUploadError('Document must be 10 MB or smaller.');
+      return;
+    }
+
+    setDocUploading(true);
+    setDocUploadError('');
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      const response = await fetch('/api/upload?kind=document', { method: 'POST', body: data });
+      const result = await response.json().catch(() => ({}));
+      if (response.ok && result.url) {
+        setForm(current => ({ ...current, document: result.url }));
+        setDocUploadError('');
+      } else {
+        setDocUploadError(result.error || 'Document upload failed. Please try again.');
+      }
+    } catch (err) {
+      setDocUploadError(err?.message || 'Document upload failed. Please try again.');
+    } finally {
+      setDocUploading(false);
+    }
+  };
+
   const saveFooter = async () => {
     try {
       const payload = {
@@ -136,8 +178,11 @@ export default function AdminClient() {
   const edit = row => {
     setUploadError('');
     setUploading(false);
+    setDocUploadError('');
+    setDocUploading(false);
     setForm({
       ...row,
+      document: row.document || '',
       tags: Array.isArray(row.tags) ? row.tags.join(', ') : (row.tags || ''),
     });
   };
@@ -300,11 +345,82 @@ export default function AdminClient() {
 
         {uploadError && <p style={{ color: '#e5534b', fontSize: 13, margin: '8px 0 0' }}>{uploadError}</p>}
       </div>
+      {tab === 'products' && (
+        <div>
+          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>Product document (PDF, max 10 MB)</label>
+          {form.document ? (
+            <div className="row" style={{ gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              {safeDocumentUrl(form.document) && (
+                <a
+                  href={safeDocumentUrl(form.document)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn ghost sm"
+                >
+                  View attached PDF ↗
+                </a>
+              )}
+              <button
+                type="button"
+                className="btn ghost sm"
+                disabled={docUploading}
+                onClick={() => docInputRef.current?.click()}
+              >
+                {docUploading ? 'Uploading PDF…' : 'Change PDF'}
+              </button>
+              <button
+                type="button"
+                className="btn ghost sm"
+                disabled={docUploading}
+                onClick={() => {
+                  setForm(current => ({ ...current, document: '' }));
+                  setDocUploadError('');
+                }}
+              >
+                Remove PDF
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start' }}>
+              <button
+                type="button"
+                className="btn ghost sm"
+                disabled={docUploading}
+                onClick={() => docInputRef.current?.click()}
+              >
+                {docUploading ? 'Uploading PDF…' : '+ Attach PDF document'}
+              </button>
+            </div>
+          )}
+
+          <input
+            ref={docInputRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            onChange={uploadDocument}
+            style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}
+          />
+
+          <div style={{ marginTop: 10 }}>
+            <label style={{ fontSize: 13, color: 'var(--mut)', display: 'block', marginBottom: 4 }}>
+              Or document path / URL:
+            </label>
+            <input
+              placeholder="/docs/hallspot-brochure.pdf or https://..."
+              value={form.document || ''}
+              onChange={event => setForm({ ...form, document: event.target.value })}
+              style={{ fontSize: 14, padding: '10px 14px' }}
+            />
+          </div>
+
+          {docUploadError && <p style={{ color: '#e5534b', fontSize: 13, margin: '8px 0 0' }}>{docUploadError}</p>}
+        </div>
+      )}
       <div className="row">
-        <button className="btn" disabled={uploading} onClick={save}>
-          {uploading ? 'Uploading image…' : `Save ${itemLabel}`}
+        <button className="btn" disabled={uploading || docUploading} onClick={save}>
+          {uploading ? 'Uploading image…' : docUploading ? 'Uploading PDF…' : `Save ${itemLabel}`}
         </button>
-        <button className="btn ghost" disabled={uploading} onClick={() => setForm(null)}>
+        <button className="btn ghost" disabled={uploading || docUploading} onClick={() => setForm(null)}>
           Cancel
         </button>
       </div>

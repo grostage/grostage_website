@@ -8,6 +8,7 @@ import './elevate.css';
 import './redesign.css';
 import './deck.css';
 import { Inter, Michroma } from 'next/font/google';
+import Script from 'next/script';
 import Nav from '@/frontend/components/Nav'; import Footer from '@/frontend/components/Footer';
 import Preloader from '@/frontend/components/Preloader';
 import SmoothScroll from '@/frontend/components/SmoothScroll';
@@ -18,6 +19,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--inter' });
 const mich = Michroma({ subsets: ['latin'], weight: '400', variable: '--mich' });
 const SITE_URL = 'https://grostage.com';
 const SITE_NAME = 'Grostage';
+const RAW_GA_ID = (process.env.NEXT_PUBLIC_GA_ID || 'G-K4E6EHYSDT').trim();
+const GA_ID = /^G-[A-Z0-9]+$/i.test(RAW_GA_ID) ? RAW_GA_ID : '';
 const DEFAULT_TITLE = 'Grostage — Built for your next stage';
 const DEFAULT_DESCRIPTION = 'AI-powered digital products, business technology and growth. Grostage brings strategy, design and technology together to move your business forward.';
 const DEFAULT_OG_IMAGE = '/projects/profile-13-0.jpeg';
@@ -103,6 +106,20 @@ export default function RootLayout({ children }) {
         <Nav />
         {children}
         <Footer />
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(GA_ID)});`}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );

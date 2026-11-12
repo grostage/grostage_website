@@ -1,7 +1,7 @@
 import { q } from '@/backend/lib/db';
 import { isAdmin } from '@/backend/lib/auth';
 import { ensureWorksTable, ensureProductsTable, getWorks, getProducts } from '@/backend/lib/content';
-import { isSameOrigin, sanitizeHref, sanitizeImageSrc, slugifySafe } from '@/backend/lib/security';
+import { isSameOrigin, sanitizeDocumentSrc, sanitizeHref, sanitizeImageSrc, slugifySafe } from '@/backend/lib/security';
 
 const ok = t => ['posts', 'pages', 'works', 'products'].includes(t);
 const structured = {
@@ -39,13 +39,16 @@ export async function POST(req, { params }) {
   const url = structured[type] ? sanitizeHref(b.url, { allowRelative: false, allowBareDomain: true }) : '';
   if (url === null) return Response.json({ error: 'Product website URL must use https:// or http://' }, { status: 400 });
 
+  const document = type === 'products' ? sanitizeDocumentSrc(b.document) : '';
+  if (document === null) return Response.json({ error: 'Provide a valid HTTPS PDF URL or /path (wait for upload to finish).' }, { status: 400 });
+
   try {
     if (structured[type]) {
       await structured[type].ensure();
       const tags = Array.isArray(b.tags) ? b.tags.join(', ') : String(b.tags || '');
       const r = await q(
-        `INSERT INTO ${type}(title,slug,category,excerpt,content,image,tags,url,published) VALUES($1,$2,$3,$4,$5,$6,$7,$8,true) RETURNING *`,
-        [title, slug, String(b.category || ''), String(b.excerpt || ''), String(b.content || ''), image, tags, url]
+        `INSERT INTO ${type}(title,slug,category,excerpt,content,image,tags,url,document,published) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,true) RETURNING *`,
+        [title, slug, String(b.category || ''), String(b.excerpt || ''), String(b.content || ''), image, tags, url, document]
       );
       return Response.json(r[0]);
     }
