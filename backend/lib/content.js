@@ -21,7 +21,37 @@ export const works = [
   {id: 9, slug: 'bright-bee', title: 'Bright Bee', category: 'EdTech / Web Design', image: '/clients/bright%20bee.webp', imageAlt: 'Bright Bee multi-page educational website built by Grostage', representative: false, tags: ['Multi-Page Website', 'EdTech', 'Web Design', 'SEO', 'Lead Capture', 'Responsive Design'], excerpt: 'A professionally designed multi-page website for Bright Bee — purpose-built to showcase courses, capture enquiries and rank consistently on search engines.', content: 'A clean, professional multi-page website built for Bright Bee, an education and training provider, designed to present their courses with clarity, generate enquiries, and perform strongly in local search.\n\n## Multi-Page Website Architecture\n\nThe site spans a structured set of pages — home, courses, about, and contact — each purpose-designed to guide visitors through the educational offering and convert interest into a direct enquiry. Navigation is simple and purposeful, built around how parents and prospective students actually explore a training provider.\n\n## Design & Visual Identity\n\nThe design reflects Bright Bee\'s brand: clean, approachable, and professional. Typography, colour and layout choices project credibility and warmth simultaneously, making the site feel trustworthy for parents making decisions about their children\'s education.\n\n## Mobile-First & Responsive\n\nFully responsive across mobile, tablet and desktop — with careful attention to touch interactions, readable font sizes and fast loading on mobile data connections, where the majority of the target audience browses.\n\n## SEO & Organic Discovery\n\nBuilt with SEO fundamentals in place from the ground up: semantic HTML structure, keyword-targeted page titles and meta descriptions, optimised heading hierarchies and fast page speeds — designed to surface consistently in local search results for relevant course queries.\n\n## Lead Capture & Enquiry Forms\n\nStrategically placed enquiry forms and clear calls to action on every key page convert organic visitors into genuine leads, making the site a continuous source of inbound student enquiries for the Bright Bee team.'},
 ];
 
-const workColumns = `id,title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,published,created_at`;
+export const products = [
+  {
+    id: 1,
+    slug: 'hallspot',
+    title: 'HallSpot',
+    category: 'Convention Center ERP / Internal Software',
+    url: 'https://hallspot.in/',
+    image: '/projects/hallspot.jpg',
+    imageAlt: 'HallSpot convention center booking and accounting platform interface by Grostage',
+    representative: false,
+    tags: [
+      'Convention Center ERP',
+      'Suite Room Inventory',
+      'OTA Channel Sync',
+      'GST & Cashbook',
+      'Role-Based Access',
+    ],
+    excerpt: 'A back-office booking and accounting platform built specifically for convention centers.',
+    content: [
+      'HallSpot is an internal back-office management and accounting platform engineered by Grostage for convention center staff and management—replacing scattered spreadsheets with one reliable system.',
+      '## Hall & Slot Scheduling\n\nManage main halls, mini halls, and event spaces across configurable slots on one live calendar. Track enquiries and tentative holds, prevent double-bookings, and generate proforma quotes, advance receipts, and GST tax invoices.',
+      '## Suite Rooms & OTA Sync\n\nCoordinate convention center suite rooms on a visual tape chart covering check-in, check-out, and guest folios. Offline bookings sync automatically with Agoda, MakeMyTrip, and Booking.com to block inventory and prevent overbooking.',
+      '## Accounts & GST Reporting\n\nEvery receipt and expense posts directly to Cash, Bank, and UPI books with month-end period locks. Export monthly category statements and GSTR-1/3B sales and input GST registers in PDF or Excel.',
+      '## Staff Roles & Customer Records\n\nGuests are stored strictly as booking and billing records with no public login accounts. Internal staff access is separated into four roles: OWNER, ACCOUNTANT, FRONT_DESK (isolated shift cash), and ADMIN.'
+    ].join('\n\n'),
+  },
+];
+
+const workColumns = `id,title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,url,published,created_at`;
+const structuredTables = { works, products };
+const tableReadyPromises = {};
 
 export function normalizeWork(row) {
   return {
@@ -31,65 +61,107 @@ export function normalizeWork(row) {
       : String(row.tags || '').split(',').map(tag => tag.trim()).filter(Boolean),
     imageAlt: row.image_alt || row.imageAlt || '',
     representative: Boolean(row.representative),
+    url: String(row.url || '').trim(),
   };
 }
+export const normalizeProduct = normalizeWork;
 
-let worksReady;
-export async function ensureWorksTable() {
-  if (!worksReady) worksReady = (async () => {
-    await q(`CREATE TABLE IF NOT EXISTS works (
-      id SERIAL PRIMARY KEY,
-      title TEXT NOT NULL,
-      slug TEXT UNIQUE NOT NULL,
-      category TEXT DEFAULT '',
-      excerpt TEXT DEFAULT '',
-      content TEXT DEFAULT '',
-      image TEXT DEFAULT '',
-      image_alt TEXT DEFAULT '',
-      representative BOOLEAN DEFAULT false,
-      gallery TEXT DEFAULT '',
-      tags TEXT DEFAULT '',
-      published BOOLEAN DEFAULT true,
-      created_at TIMESTAMPTZ DEFAULT now()
-    )`);
-    // Only adds projects that are missing; never overwrites what was edited in the admin.
-    for (const work of works) {
-      await q(`INSERT INTO works(title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,published)
-        VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,true)
-        ON CONFLICT(slug) DO NOTHING`, [
-        work.title, work.slug, work.category, work.excerpt, work.content, work.image,
-        work.imageAlt || '', Boolean(work.representative), work.gallery || '', work.tags.join(', ')
-      ]);
-    }
-  })().catch(error => { worksReady = null; throw error; });
-  return worksReady;
+async function markTableSeeded(key) {
+  await q(
+    `INSERT INTO settings(key, value) VALUES($1, 'true'::jsonb) ON CONFLICT(key) DO NOTHING`,
+    [key]
+  );
 }
 
-export async function getWorks({ includeDrafts = false } = {}) {
+// Runs initial table seeding at most once per table; after any seed runs (or if
+// production rows already exist), a persistent marker in settings prevents
+// redeploys from overwriting or re-inserting edited/deleted content.
+async function runOneTimeSeed(table, seedFn) {
+  await q(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value JSONB NOT NULL)`);
+  const markerKey = `seeded:${table}`;
+  const marked = await q(`SELECT 1 FROM settings WHERE key = $1 LIMIT 1`, [markerKey]);
+  if (marked.length > 0) return;
+
+  const countRow = await q(`SELECT count(*)::int AS cnt FROM ${table}`);
+  if (!countRow[0]?.cnt) {
+    await seedFn();
+  }
+  await markTableSeeded(markerKey);
+}
+
+async function ensureStructuredTable(table) {
+  const seedRows = structuredTables[table];
+  if (!seedRows) throw new Error(`Unknown structured table: ${table}`);
+  if (!tableReadyPromises[table]) {
+    tableReadyPromises[table] = (async () => {
+      await q(`CREATE TABLE IF NOT EXISTS ${table} (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        category TEXT DEFAULT '',
+        excerpt TEXT DEFAULT '',
+        content TEXT DEFAULT '',
+        image TEXT DEFAULT '',
+        image_alt TEXT DEFAULT '',
+        representative BOOLEAN DEFAULT false,
+        gallery TEXT DEFAULT '',
+        tags TEXT DEFAULT '',
+        url TEXT DEFAULT '',
+        published BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ DEFAULT now()
+      )`);
+      await q(`ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS url TEXT DEFAULT ''`);
+      await q(`ALTER TABLE ${table} ALTER COLUMN url SET DEFAULT ''`);
+      await q(`UPDATE ${table} SET url = '' WHERE url IS NULL`);
+      await runOneTimeSeed(table, async () => {
+        for (const item of seedRows) {
+          await q(`INSERT INTO ${table}(title,slug,category,excerpt,content,image,image_alt,representative,gallery,tags,url,published)
+            VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,true)
+            ON CONFLICT(slug) DO NOTHING`, [
+            item.title, item.slug, item.category, item.excerpt, item.content, item.image,
+            item.imageAlt || '', Boolean(item.representative), item.gallery || '', item.tags.join(', '), item.url || ''
+          ]);
+        }
+      });
+    })().catch(error => { tableReadyPromises[table] = null; throw error; });
+  }
+  return tableReadyPromises[table];
+}
+
+async function listStructured(table, { includeDrafts = false } = {}) {
+  const fallback = structuredTables[table];
   try {
-    await ensureWorksTable();
-    const rows = await q(`SELECT ${workColumns} FROM works ${includeDrafts ? '' : 'WHERE published'} ORDER BY id ASC`);
+    await ensureStructuredTable(table);
+    const rows = await q(`SELECT ${workColumns} FROM ${table} ${includeDrafts ? '' : 'WHERE published'} ORDER BY id ASC`);
     const normalized = rows.map(normalizeWork);
-    return includeDrafts ? normalized : normalized.map(work => ({
-      ...work,
-      image: String(work.image || '').trim() || '/projects/work-placeholder.svg',
+    return includeDrafts ? normalized : normalized.map(item => ({
+      ...item,
+      image: String(item.image || '').trim() || '/projects/work-placeholder.svg',
     }));
   } catch (error) {
-    console.error('Work content read failed', error);
-    return includeDrafts ? [] : works;
+    console.error(`${table} content read failed`, error);
+    return includeDrafts ? [] : fallback;
   }
 }
 
-export async function getWork(slug, { includeDrafts = false } = {}) {
+async function findStructured(table, slug, { includeDrafts = false } = {}) {
+  const fallback = structuredTables[table];
   try {
-    await ensureWorksTable();
-    const rows = await q(`SELECT ${workColumns} FROM works WHERE slug=$1 ${includeDrafts ? '' : 'AND published'} LIMIT 1`, [slug]);
+    await ensureStructuredTable(table);
+    const rows = await q(`SELECT ${workColumns} FROM ${table} WHERE slug=$1 ${includeDrafts ? '' : 'AND published'} LIMIT 1`, [slug]);
     return rows[0] ? normalizeWork(rows[0]) : null;
   } catch (error) {
-    console.error('Work content read failed', error);
-    return works.find(work => work.slug === slug) || null;
+    console.error(`${table} content read failed`, error);
+    return fallback.find(item => item.slug === slug) || null;
   }
 }
+
+export const ensureWorksTable = () => ensureStructuredTable('works');
+export const ensureProductsTable = () => ensureStructuredTable('products');
+export const getWorks = opts => listStructured('works', opts);
+export const getProducts = opts => listStructured('products', opts);
+export const getWork = (slug, opts) => findStructured('works', slug, opts);
+export const getProduct = (slug, opts) => findStructured('products', slug, opts);
 export const samplePosts = [
   {id: 'sample-1', slug: 'technology-with-a-business-purpose', title: 'Technology with a business purpose.', category: 'Perspective', image: '/projects/profile-13-0.jpeg', excerpt: 'Start with the problem. Then build the right digital solution around it.', content: 'Businesses rarely need technology for the sake of technology. They need better ways to acquire customers, manage operations, automate repetitive work, understand data and deliver better experiences.\n\n## Start with the business\n\nGrostage works with businesses to understand the problem first, then design and build the right digital solution around it. Strategy gives the work direction: understanding the business, its goals and its challenges.\n\n## Bring the disciplines together\n\nDesign creates clear and purposeful experiences. Technology turns those experiences into reliable websites, software and systems. Growth connects the product with marketing, automation and measurable business objectives.\n\n## Build for what comes next\n\nA practical solution needs to be useful and maintainable. The next stage of the business should shape the decisions made today.'},
   {id: 'sample-2', slug: 'from-information-to-action', title: 'From information to insight to action.', category: 'AI & Data', image: '/projects/profile-8-0.jpeg', excerpt: 'Where AI, automation and analytics meet everyday business operations.', content: 'Grostage uses AI, automation and analytics to help businesses reduce repetitive work and make better decisions. The focus is practical: useful information, clearer insight and workflows that support action.\n\n## Make data useful\n\nPower BI dashboards, sales analytics, financial reporting and operational dashboards bring information into the context of business decisions. Automated reporting connects this information to recurring needs.\n\n## Make automation intelligent\n\nAI assistants, chatbots, document processing and AI-powered workflows can become parts of a broader business system. Integrations connect these capabilities with the tools a team uses.\n\n## Connect the workflow\n\nWorkflow automation, API integrations, data processing and notifications connect information with the next step. The starting point remains the business process that needs to improve.'},
@@ -196,15 +268,14 @@ export async function ensureTestimonialsTable() {
       created_at TIMESTAMPTZ DEFAULT now()
     )`);
     await q(`ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS logo TEXT DEFAULT ''`);
-    const countRow = await q('SELECT count(*)::int as cnt FROM testimonials');
-    if (!countRow[0]?.cnt) {
+    await runOneTimeSeed('testimonials', async () => {
       for (const t of testimonials) {
         await q(`INSERT INTO testimonials(name, role, quote, initials, company, logo)
           VALUES($1, $2, $3, $4, $5, $6)`, [
           t.name, t.role, t.quote, t.initials || '', t.company || t.name, t.logo || ''
         ]);
       }
-    }
+    });
   })().catch(error => { testimonialsReady = null; console.error('Testimonials table check error:', error); });
   return testimonialsReady;
 }

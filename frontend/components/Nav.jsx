@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { gsap } from '@/frontend/lib/gsap';
 import Logo from './Logo';
-const navigation = [['Home', '/'], ['About Us', '/about'], ['Services', '/services'], ['Marketing Services', '/marketing-services'], ['Our Work', '/work'], ['Client Stories', '/client-stories']];
+const navigation = [['Home', '/'], ['About Us', '/about'], ['Services', '/services'], ['Marketing Services', '/marketing-services'], ['Our Work', '/work'], ['Our Products', '/products'], ['Client Stories', '/client-stories']];
 // The sidebar menu. On small screens the top links are hidden, so they join it there.
 const sidebar = [['Blog', '/blog'], ['Clients', '/clients'], ['Contact us', '/contact']];
 export default function Nav() {
@@ -75,7 +75,7 @@ export default function Nav() {
       document.removeEventListener('keydown', key);
     };
   }, [open]);
-  const dark = ['/', '/about', '/services', '/marketing-services', '/work', '/blog', '/clients', '/client-stories', '/contact'].includes(pathname);
+  const dark = ['/', '/about', '/services', '/marketing-services', '/work', '/products', '/blog', '/clients', '/client-stories', '/contact'].includes(pathname) || pathname.startsWith('/products/') || pathname.startsWith('/work/') || pathname.startsWith('/blog/');
   return <>
     <header ref={header} data-theme={dark ? 'dark' : 'light'} className={`nav studio-nav fluid-nav${pathname.startsWith('/marketing-services') ? ' is-marketing' : ''}${open ? ' is-open' : ''}`}><div className="wrap nav-in"><Logo />
       <nav className="nav-links" aria-label="Main navigation">{navigation.map(([label, href]) => <Link key={href} href={href} aria-current={(href === '/' ? pathname === '/' : pathname.startsWith(href)) ? 'page' : undefined}>{label}</Link>)}</nav>

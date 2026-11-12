@@ -4,7 +4,7 @@ export const defaultFooter = {
   tagline: 'Digital products. Technology. Growth.', email: 'info@grostage.com', phone: '', address: '',
   links: [
     { label: 'About Us', value: '/about' }, { label: 'Services', value: '/services' },
-    { label: 'Our Work', value: '/work' }, { label: 'Blog', value: '/blog' },
+    { label: 'Our Work', value: '/work' }, { label: 'Our Products', value: '/products' }, { label: 'Blog', value: '/blog' },
     { label: 'Client Stories', value: '/client-stories' }, { label: 'Clients', value: '/clients' }, { label: 'Contact', value: '/contact' },
   ],
   socials: [

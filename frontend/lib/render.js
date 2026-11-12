@@ -12,3 +12,17 @@ export function chapters(text = '') {
   }
   return { intro, list };
 }
+
+/** Validates an external product URL and returns a safe https/http href or empty string. */
+export function safeProductUrl(url = '') {
+  const trimmed = String(url || '').trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(trimmed)) return `https://${trimmed}`;
+  return '';
+}
+
+/** Strips scheme and trailing slash for concise external link labels (e.g. hallspot.in). */
+export function formatUrlLabel(url = '') {
+  return String(url || '').replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+}

@@ -1,6 +1,7 @@
 import PageIntro from '@/frontend/components/PageIntro';
 import ContactForm from '@/frontend/components/ContactForm';
 import CopyEmail from '@/frontend/components/CopyEmail';
+import ScheduleMeeting from '@/frontend/components/ScheduleMeeting';
 export const metadata = {
   title: 'Contact — Grostage',
   description: 'Start a conversation with Grostage. Tell us about your project and we\'ll help you plan the next stage of your digital journey.',
@@ -25,5 +26,6 @@ export default function Contact() {
       </div>
       <div className="rx-contact-form"><ContactForm /></div>
     </section>
+    <ScheduleMeeting />
   </main>;
 }

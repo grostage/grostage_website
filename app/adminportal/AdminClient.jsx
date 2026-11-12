@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import MarketingMediaPanel from './MarketingMediaPanel';
 
-const empty = { title: '', slug: '', category: '', excerpt: '', content: '', tags: '', image: '', published: true };
+const empty = { title: '', slug: '', category: '', url: '', excerpt: '', content: '', tags: '', image: '', published: true };
 const footerFields = [['tagline', 'Tagline'], ['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['copyright', 'Copyright text']];
 const socialFields = [['linkedin', 'LinkedIn URL', 'LinkedIn'], ['instagram', 'Instagram URL', 'Instagram'], ['facebook', 'Facebook URL', 'Facebook'], ['youtube', 'YouTube URL', 'YouTube'], ['twitter', 'Twitter / X URL', 'Twitter / X']];
 const socialAliases = { linkedin: 'linkedin', instagram: 'instagram', facebook: 'facebook', youtube: 'youtube', twitter: 'twitter', twitterx: 'twitter', x: 'twitter' };
@@ -62,7 +62,7 @@ export default function AdminClient() {
     const data = await response.json();
     if (!response.ok) return setMessage(data.error || 'Unable to save');
     setForm(null);
-    setMessage(tab === 'works' ? 'Work saved successfully.' : 'Post saved.');
+    setMessage(tab === 'works' ? 'Work saved successfully.' : tab === 'products' ? 'Product saved successfully.' : 'Post saved.');
     load();
   };
 
@@ -137,12 +137,14 @@ export default function AdminClient() {
     });
   };
 
-  const publicPath = row => `/${tab === 'works' ? 'work' : 'blog'}/${row.slug}`;
+  const publicPath = row => `/${tab === 'works' ? 'work' : tab === 'products' ? 'products' : 'blog'}/${row.slug}`;
+  const itemLabel = tab === 'works' ? 'work' : tab === 'products' ? 'product' : 'post';
+  const isStructured = tab === 'works' || tab === 'products';
 
   return <main id="main-content" className="sec top adm"><div className="wrap">
     <div className="row between"><h1 className="h2" style={{ fontSize: 40 }}>Admin</h1><button className="btn ghost sm" onClick={logOut}>Log out</button></div>
     <div className="tabs">
-      {[['works', 'Work'], ['posts', 'Blog posts'], ['contacts', 'Contact submissions'], ['footer', 'Footer'], ['marketing-media', 'Marketing Media']].map(([key, label]) =>
+      {[['works', 'Work'], ['products', 'Our Products'], ['posts', 'Blog posts'], ['contacts', 'Contact submissions'], ['footer', 'Footer'], ['marketing-media', 'Marketing Media']].map(([key, label]) =>
         <button key={key} className={tab === key ? 'on' : ''} onClick={() => {
           if (tab === 'marketing-media' && key !== tab && marketingMediaRef.current && !marketingMediaRef.current.confirmDiscard()) return;
           setTab(key);
@@ -178,12 +180,12 @@ export default function AdminClient() {
     </div>}
 
     {tab === 'contacts' && <div className="list">
-      {rows.map(row => <article key={row.id} className="item contact-item"><div><b>{row.name}</b><small className="mut"> {row.email} · {new Date(row.created_at).toLocaleString()}</small><p>{row.message}</p></div></article>)}
+      {rows.map(row => <article key={row.id} className="item contact-item"><div>{row.title && <p><b>Subject:</b> {row.title}</p>}<b>{row.name}</b><small className="mut"> {row.email} · {new Date(row.created_at).toLocaleString()}</small><p>{row.message}</p></div></article>)}
       {!rows.length && <p className="mut">No contact submissions yet.</p>}
     </div>}
 
-    {!['footer', 'contacts'].includes(tab) && !form && <>
-      <button className="btn sm" onClick={() => setForm({ ...empty })}>+ Add new {tab === 'works' ? 'work' : 'post'}</button>
+    {!['footer', 'contacts', 'marketing-media'].includes(tab) && !form && <>
+      <button className="btn sm" onClick={() => setForm({ ...empty })}>+ Add new {itemLabel}</button>
       <div className="list">
         {rows.map(row => <div key={row.id} className="item"><div><b>{row.title}</b><small className="mut"> {publicPath(row)}</small></div>
           <div className="row"><a className="btn ghost sm" href={publicPath(row)} target="_blank" rel="noreferrer">View</a><button className="btn ghost sm" onClick={() => edit(row)}>Edit</button><button className="btn ghost sm" onClick={() => remove(row.id)}>Delete</button></div>
@@ -192,13 +194,14 @@ export default function AdminClient() {
       </div>
     </>}
 
-    {!['footer', 'contacts'].includes(tab) && form && <div className="cform">
+    {!['footer', 'contacts', 'marketing-media'].includes(tab) && form && <div className="cform">
       <label>Title<input value={form.title} onChange={event => setForm({ ...form, title: event.target.value })} /></label>
       <label>Slug (optional)<input value={form.slug} onChange={event => setForm({ ...form, slug: event.target.value })} /></label>
-      {tab === 'works' && <label>Category<input placeholder="Example: E-commerce / Digital product" value={form.category || ''} onChange={event => setForm({ ...form, category: event.target.value })} /></label>}
+      {isStructured && <label>Category<input placeholder={tab === 'products' ? 'Example: Hospitality & Venue ERP / Internal Software' : 'Example: E-commerce / Digital product'} value={form.category || ''} onChange={event => setForm({ ...form, category: event.target.value })} /></label>}
+      {tab === 'products' && <label>Product website URL (optional)<input type="url" inputMode="url" placeholder="https://hallspot.in/" value={form.url || ''} onChange={event => setForm({ ...form, url: event.target.value })} /></label>}
       <label>Short summary<input value={form.excerpt} onChange={event => setForm({ ...form, excerpt: event.target.value })} /></label>
-      <label>Detailed content <small className="mut">Use a blank line for a new paragraph. Start a heading with ## followed by a space.</small><textarea rows={14} placeholder={'Project introduction.\n\n## The challenge\n\nDescribe the challenge here.'} value={form.content} onChange={event => setForm({ ...form, content: event.target.value })} /></label>
-      {tab === 'works' && <label>Tags (comma separated)<input placeholder="Website, UI/UX, E-commerce" value={form.tags || ''} onChange={event => setForm({ ...form, tags: event.target.value })} /></label>}
+      <label>Detailed content <small className="mut">Use a blank line for a new paragraph. Start a heading with ## followed by a space.</small><textarea rows={14} placeholder={tab === 'products' ? 'Product overview.\n\n## Core Capabilities\n\nDescribe key modules and workflows here.' : 'Project introduction.\n\n## The challenge\n\nDescribe the challenge here.'} value={form.content} onChange={event => setForm({ ...form, content: event.target.value })} /></label>
+      {isStructured && <label>Tags (comma separated)<input placeholder={tab === 'products' ? 'PMS & Venue ERP, GST Invoicing, Role-Based Access' : 'Website, UI/UX, E-commerce'} value={form.tags || ''} onChange={event => setForm({ ...form, tags: event.target.value })} /></label>}
       <div>
         <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>Cover image</label>
         {form.image ? (
@@ -294,7 +297,7 @@ export default function AdminClient() {
       </div>
       <div className="row">
         <button className="btn" disabled={uploading} onClick={save}>
-          {uploading ? 'Uploading image…' : `Save ${tab === 'works' ? 'work' : 'post'}`}
+          {uploading ? 'Uploading image…' : `Save ${itemLabel}`}
         </button>
         <button className="btn ghost" disabled={uploading} onClick={() => setForm(null)}>
           Cancel

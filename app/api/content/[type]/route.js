@@ -1,28 +1,51 @@
-import { q } from '@/backend/lib/db'; import { isAdmin } from '@/backend/lib/auth';
-import { ensureWorksTable, getWorks } from '@/backend/lib/content';
+import { q } from '@/backend/lib/db';
+import { isAdmin } from '@/backend/lib/auth';
+import { ensureWorksTable, ensureProductsTable, getWorks, getProducts } from '@/backend/lib/content';
+
 const slugify = s => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-const ok = t => ['posts', 'pages', 'works'].includes(t);
+const ok = t => ['posts', 'pages', 'works', 'products'].includes(t);
+const structured = {
+  works: { ensure: ensureWorksTable, list: getWorks },
+  products: { ensure: ensureProductsTable, list: getProducts },
+};
+
 export async function GET(_, { params }) {
-  const { type } = await params; if (!ok(type)) return Response.json({ error: 'Unknown content type' }, { status: 404 });
-  if (type === 'works') {
+  const { type } = await params;
+  if (!ok(type)) return Response.json({ error: 'Unknown content type' }, { status: 404 });
+  if (structured[type]) {
     if (!(await isAdmin())) return Response.json({}, { status: 401 });
-    return Response.json(await getWorks({ includeDrafts: true }));
+    return Response.json(await structured[type].list({ includeDrafts: true }));
   }
-  try { return Response.json(await q(`SELECT * FROM ${type} ORDER BY created_at DESC`)); }
-  catch (error) { console.error('Content read failed', error); return Response.json({ error: 'Content is unavailable' }, { status: 503 }); }
+  try {
+    return Response.json(await q(`SELECT * FROM ${type} ORDER BY created_at DESC`));
+  } catch (error) {
+    console.error('Content read failed', error);
+    return Response.json({ error: 'Content is unavailable' }, { status: 503 });
+  }
 }
+
 export async function POST(req, { params }) {
-  const { type } = await params; if (!ok(type) || !(await isAdmin())) return Response.json({}, { status: 401 });
+  const { type } = await params;
+  if (!ok(type) || !(await isAdmin())) return Response.json({}, { status: 401 });
   const b = await req.json().catch(() => ({}));
   if (!String(b.title || '').trim()) return Response.json({ error: 'Title is required' }, { status: 400 });
   try {
-    if (type === 'works') {
-      await ensureWorksTable();
+    if (structured[type]) {
+      await structured[type].ensure();
       const tags = Array.isArray(b.tags) ? b.tags.join(', ') : String(b.tags || '');
-      const r = await q(`INSERT INTO works(title,slug,category,excerpt,content,image,tags,published) VALUES($1,$2,$3,$4,$5,$6,$7,true) RETURNING *`, [b.title, slugify(b.slug || b.title), b.category || '', b.excerpt || '', b.content || '', b.image || '', tags]);
+      const r = await q(
+        `INSERT INTO ${type}(title,slug,category,excerpt,content,image,tags,url,published) VALUES($1,$2,$3,$4,$5,$6,$7,$8,true) RETURNING *`,
+        [b.title, slugify(b.slug || b.title), b.category || '', b.excerpt || '', b.content || '', b.image || '', tags, String(b.url || '').trim()]
+      );
       return Response.json(r[0]);
     }
-    const r = await q(`INSERT INTO ${type}(title,slug,excerpt,content,image,published) VALUES($1,$2,$3,$4,$5,true) RETURNING *`, [b.title, slugify(b.slug || b.title), b.excerpt || '', b.content || '', b.image || '']);
+    const r = await q(
+      `INSERT INTO ${type}(title,slug,excerpt,content,image,published) VALUES($1,$2,$3,$4,$5,true) RETURNING *`,
+      [b.title, slugify(b.slug || b.title), b.excerpt || '', b.content || '', b.image || '']
+    );
     return Response.json(r[0]);
-  } catch (e) { console.error('Content create failed', e); return Response.json({ error: 'Content could not be saved. Check the database connection.' }, { status: 503 }); }
+  } catch (e) {
+    console.error('Content create failed', e);
+    return Response.json({ error: 'Content could not be saved. Check the database connection.' }, { status: 503 });
+  }
 }

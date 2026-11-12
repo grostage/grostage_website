@@ -280,6 +280,27 @@ const pages = [
   }
 ];
 
+const products = [
+  {
+    slug: 'hallspot',
+    title: 'HallSpot',
+    category: 'Convention Center ERP / Internal Software',
+    url: 'https://hallspot.in/',
+    image: '/projects/hallspot.jpg',
+    image_alt: 'HallSpot convention center booking and accounting platform interface by Grostage',
+    representative: false,
+    tags: 'Convention Center ERP, Suite Room Inventory, OTA Channel Sync, GST & Cashbook, Role-Based Access',
+    excerpt: 'A back-office booking and accounting platform built specifically for convention centers.',
+    content: [
+      'HallSpot is an internal back-office management and accounting platform engineered by Grostage for convention center staff and management—replacing scattered spreadsheets with one reliable system.',
+      '## Hall & Slot Scheduling\n\nManage main halls, mini halls, and event spaces across configurable slots on one live calendar. Track enquiries and tentative holds, prevent double-bookings, and generate proforma quotes, advance receipts, and GST tax invoices.',
+      '## Suite Rooms & OTA Sync\n\nCoordinate convention center suite rooms on a visual tape chart covering check-in, check-out, and guest folios. Offline bookings sync automatically with Agoda, MakeMyTrip, and Booking.com to block inventory and prevent overbooking.',
+      '## Accounts & GST Reporting\n\nEvery receipt and expense posts directly to Cash, Bank, and UPI books with month-end period locks. Export monthly category statements and GSTR-1/3B sales and input GST registers in PDF or Excel.',
+      '## Staff Roles & Customer Records\n\nGuests are stored strictly as booking and billing records with no public login accounts. Internal staff access is separated into four roles: OWNER, ACCOUNTANT, FRONT_DESK (isolated shift cash), and ADMIN.'
+    ].join('\n\n')
+  }
+];
+
 const footerSetting = {
   tagline: 'Digital products. Technology. Growth.',
   email: 'info@grostage.com',
@@ -289,6 +310,7 @@ const footerSetting = {
     { label: 'About Us', value: '/about' },
     { label: 'Services', value: '/services' },
     { label: 'Our Work', value: '/work' },
+    { label: 'Our Products', value: '/products' },
     { label: 'Blog', value: '/blog' },
     { label: 'Client Stories', value: '/client-stories' },
     { label: 'Clients', value: '/clients' },
@@ -301,12 +323,34 @@ const footerSetting = {
   copyright: '© 2026 Grostage. All rights reserved.'
 };
 
+async function markSeeded(key) {
+  await client.query(
+    `INSERT INTO settings(key, value) VALUES($1, 'true'::jsonb) ON CONFLICT(key) DO NOTHING`,
+    [key]
+  );
+}
+
+// Seeds a table only if it has never been seeded before and currently holds no rows,
+// ensuring production edits/deletions are never overwritten across redeploys.
+async function shouldSeedTable(key, table) {
+  const marked = await client.query(`SELECT 1 FROM settings WHERE key = $1 LIMIT 1`, [key]);
+  if (marked.rows.length > 0) return false;
+
+  const { rows } = await client.query(`SELECT count(*)::int AS cnt FROM ${table}`);
+  if (rows[0]?.cnt > 0) {
+    await markSeeded(key);
+    return false;
+  }
+  return true;
+}
+
 async function seed() {
   await client.connect();
   console.log('Connected to database:', process.env.DATABASE_URL.replace(/:[^:@]*@/, ':****@'));
 
-  // 0. Seed Admin user
-  console.log('Seeding admin user...');
+  await client.query(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value JSONB NOT NULL)`);
+
+  // 0. Seed Admin user (only if admins table is empty)
   await client.query(`
     CREATE TABLE IF NOT EXISTS admins (
       id SERIAL PRIMARY KEY,
@@ -315,85 +359,174 @@ async function seed() {
       created_at TIMESTAMPTZ DEFAULT now()
     )
   `);
+  if (await shouldSeedTable('seeded:admins', 'admins')) {
+    console.log('Seeding admin user...');
+    const adminEmail = (process.env.ADMIN_EMAIL || 'grostage@gmail.com').trim().toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
+    const hashedPassword = hashPassword(adminPassword);
 
-  const adminEmail = (process.env.ADMIN_EMAIL || 'grostage@gmail.com').trim().toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
-  const hashedPassword = hashPassword(adminPassword);
+    await client.query(`
+      INSERT INTO admins(email, password_hash)
+      VALUES($1, $2)
+      ON CONFLICT(email) DO NOTHING
+    `, [adminEmail, hashedPassword]);
+    await markSeeded('seeded:admins');
+    console.log(`✓ Seeded admin user: ${adminEmail}`);
+  } else {
+    console.log('↷ Skipped admin user (existing admin preserved)');
+  }
 
+  // 1. Seed Works (only on fresh empty DB)
   await client.query(`
-    INSERT INTO admins(email, password_hash)
-    VALUES($1, $2)
-    ON CONFLICT(email) DO UPDATE SET password_hash = EXCLUDED.password_hash
-  `, [adminEmail, hashedPassword]);
-  console.log(`✓ Seeded admin user: ${adminEmail}`);
-
-  // 1. Seed Works
-  console.log('Seeding works...');
-  for (const w of works) {
-    await client.query(`
-      INSERT INTO works(title, slug, category, excerpt, content, image, image_alt, representative, gallery, tags, published)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true)
-      ON CONFLICT(slug) DO UPDATE SET
-        title = EXCLUDED.title,
-        category = EXCLUDED.category,
-        excerpt = EXCLUDED.excerpt,
-        content = EXCLUDED.content,
-        image = EXCLUDED.image,
-        image_alt = EXCLUDED.image_alt,
-        representative = EXCLUDED.representative,
-        gallery = EXCLUDED.gallery,
-        tags = EXCLUDED.tags,
-        published = EXCLUDED.published
-    `, [
-      w.title, w.slug, w.category, w.excerpt, w.content, w.image,
-      w.image_alt || '', Boolean(w.representative), w.gallery || '', w.tags
-    ]);
+    CREATE TABLE IF NOT EXISTS works (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      category TEXT DEFAULT '',
+      excerpt TEXT DEFAULT '',
+      content TEXT DEFAULT '',
+      image TEXT DEFAULT '',
+      image_alt TEXT DEFAULT '',
+      representative BOOLEAN DEFAULT false,
+      gallery TEXT DEFAULT '',
+      tags TEXT DEFAULT '',
+      url TEXT DEFAULT '',
+      published BOOLEAN DEFAULT true,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )
+  `);
+  await client.query(`ALTER TABLE works ADD COLUMN IF NOT EXISTS url TEXT DEFAULT ''`);
+  if (await shouldSeedTable('seeded:works', 'works')) {
+    console.log('Seeding works...');
+    for (const w of works) {
+      await client.query(`
+        INSERT INTO works(title, slug, category, excerpt, content, image, image_alt, representative, gallery, tags, url, published)
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, '', true)
+        ON CONFLICT(slug) DO NOTHING
+      `, [
+        w.title, w.slug, w.category, w.excerpt, w.content, w.image,
+        w.image_alt || '', Boolean(w.representative), w.gallery || '', w.tags
+      ]);
+    }
+    await markSeeded('seeded:works');
+    console.log(`✓ Seeded ${works.length} works`);
+  } else {
+    console.log('↷ Skipped works (existing production content preserved)');
   }
-  console.log(`✓ Seeded ${works.length} works`);
 
-  // 2. Seed Posts
-  console.log('Seeding posts...');
-  for (const p of posts) {
-    await client.query(`
-      INSERT INTO posts(title, slug, excerpt, content, image, published)
-      VALUES($1, $2, $3, $4, $5, true)
-      ON CONFLICT(slug) DO UPDATE SET
-        title = EXCLUDED.title,
-        excerpt = EXCLUDED.excerpt,
-        content = EXCLUDED.content,
-        image = EXCLUDED.image,
-        published = EXCLUDED.published
-    `, [p.title, p.slug, p.excerpt, p.content, p.image]);
-  }
-  console.log(`✓ Seeded ${posts.length} posts`);
-
-  // 3. Seed Pages
-  console.log('Seeding pages...');
-  for (const pgItem of pages) {
-    await client.query(`
-      INSERT INTO pages(title, slug, excerpt, content, image, published)
-      VALUES($1, $2, $3, $4, $5, true)
-      ON CONFLICT(slug) DO UPDATE SET
-        title = EXCLUDED.title,
-        excerpt = EXCLUDED.excerpt,
-        content = EXCLUDED.content,
-        image = EXCLUDED.image,
-        published = EXCLUDED.published
-    `, [pgItem.title, pgItem.slug, pgItem.excerpt, pgItem.content, pgItem.image]);
-  }
-  console.log(`✓ Seeded ${pages.length} pages`);
-
-  // 4. Seed Settings (Footer)
-  console.log('Seeding settings...');
+  // 1b. Seed Products (runs once, never overwrites or re-inserts after edit/delete)
   await client.query(`
-    INSERT INTO settings(key, value)
-    VALUES('footer', $1::jsonb)
-    ON CONFLICT(key) DO UPDATE SET value = EXCLUDED.value
-  `, [JSON.stringify(footerSetting)]);
-  console.log('✓ Seeded footer settings');
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      category TEXT DEFAULT '',
+      excerpt TEXT DEFAULT '',
+      content TEXT DEFAULT '',
+      image TEXT DEFAULT '',
+      image_alt TEXT DEFAULT '',
+      representative BOOLEAN DEFAULT false,
+      gallery TEXT DEFAULT '',
+      tags TEXT DEFAULT '',
+      url TEXT DEFAULT '',
+      published BOOLEAN DEFAULT true,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )
+  `);
+  await client.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS url TEXT DEFAULT ''`);
+  if (await shouldSeedTable('seeded:products', 'products')) {
+    console.log('Seeding products...');
+    for (const pr of products) {
+      await client.query(`
+        INSERT INTO products(title, slug, category, excerpt, content, image, image_alt, representative, gallery, tags, url, published)
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true)
+        ON CONFLICT(slug) DO NOTHING
+      `, [
+        pr.title, pr.slug, pr.category, pr.excerpt, pr.content, pr.image,
+        pr.image_alt || '', Boolean(pr.representative), pr.gallery || '', pr.tags, pr.url || ''
+      ]);
+    }
+    await markSeeded('seeded:products');
+    console.log(`✓ Seeded ${products.length} products`);
+  } else {
+    console.log('↷ Skipped products (already seeded once)');
+  }
 
-  // 5. Seed Testimonials
-  console.log('Seeding testimonials...');
+  // 2. Seed Posts (only on fresh empty DB)
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS posts (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      excerpt TEXT DEFAULT '',
+      content TEXT DEFAULT '',
+      image TEXT DEFAULT '',
+      published BOOLEAN DEFAULT true,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )
+  `);
+  if (await shouldSeedTable('seeded:posts', 'posts')) {
+    console.log('Seeding posts...');
+    for (const p of posts) {
+      await client.query(`
+        INSERT INTO posts(title, slug, excerpt, content, image, published)
+        VALUES($1, $2, $3, $4, $5, true)
+        ON CONFLICT(slug) DO NOTHING
+      `, [p.title, p.slug, p.excerpt, p.content, p.image]);
+    }
+    await markSeeded('seeded:posts');
+    console.log(`✓ Seeded ${posts.length} posts`);
+  } else {
+    console.log('↷ Skipped posts (existing production content preserved)');
+  }
+
+  // 3. Seed Pages (only on fresh empty DB)
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS pages (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      excerpt TEXT DEFAULT '',
+      content TEXT DEFAULT '',
+      image TEXT DEFAULT '',
+      published BOOLEAN DEFAULT true,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )
+  `);
+  if (await shouldSeedTable('seeded:pages', 'pages')) {
+    console.log('Seeding pages...');
+    for (const pgItem of pages) {
+      await client.query(`
+        INSERT INTO pages(title, slug, excerpt, content, image, published)
+        VALUES($1, $2, $3, $4, $5, true)
+        ON CONFLICT(slug) DO NOTHING
+      `, [pgItem.title, pgItem.slug, pgItem.excerpt, pgItem.content, pgItem.image]);
+    }
+    await markSeeded('seeded:pages');
+    console.log(`✓ Seeded ${pages.length} pages`);
+  } else {
+    console.log('↷ Skipped pages (existing production content preserved)');
+  }
+
+  // 4. Seed Settings (Footer - only if footer has never been seeded or set)
+  const footerCheck = await client.query(
+    `SELECT 1 FROM settings WHERE key IN ('footer', 'seeded:footer') LIMIT 1`
+  );
+  if (footerCheck.rows.length === 0) {
+    console.log('Seeding settings...');
+    await client.query(`
+      INSERT INTO settings(key, value)
+      VALUES('footer', $1::jsonb)
+      ON CONFLICT(key) DO NOTHING
+    `, [JSON.stringify(footerSetting)]);
+    await markSeeded('seeded:footer');
+    console.log('✓ Seeded footer settings');
+  } else {
+    await markSeeded('seeded:footer');
+    console.log('↷ Skipped footer settings (existing production footer preserved)');
+  }
+
+  // 5. Seed Testimonials (only if never seeded and currently empty)
   await client.query(`
     CREATE TABLE IF NOT EXISTS testimonials (
       id SERIAL PRIMARY KEY,
@@ -407,18 +540,22 @@ async function seed() {
     )
   `);
   await client.query(`ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS logo TEXT DEFAULT ''`);
-
-  await client.query(`TRUNCATE TABLE testimonials RESTART IDENTITY`);
-  for (const t of testimonials) {
-    await client.query(`
-      INSERT INTO testimonials(name, role, quote, initials, company, logo)
-      VALUES($1, $2, $3, $4, $5, $6)
-    `, [t.name, t.role, t.quote, t.initials || '', t.company || t.name, t.logo || '']);
+  if (await shouldSeedTable('seeded:testimonials', 'testimonials')) {
+    console.log('Seeding testimonials...');
+    for (const t of testimonials) {
+      await client.query(`
+        INSERT INTO testimonials(name, role, quote, initials, company, logo)
+        VALUES($1, $2, $3, $4, $5, $6)
+      `, [t.name, t.role, t.quote, t.initials || '', t.company || t.name, t.logo || '']);
+    }
+    await markSeeded('seeded:testimonials');
+    console.log(`✓ Seeded ${testimonials.length} testimonials`);
+  } else {
+    console.log('↷ Skipped testimonials (existing production content preserved)');
   }
-  console.log(`✓ Seeded ${testimonials.length} testimonials`);
 
   await client.end();
-  console.log('\nAll seed operations completed successfully.');
+  console.log('\nSeed check completed without overwriting existing content.');
 }
 
 seed().catch(err => {

@@ -225,6 +225,16 @@
 .form-status{font-size:14px;min-height:1.4em}
 .form-status.is-ok{color:var(--rx-teal);animation:rx-fade .5s var(--rx-out) both}
 .form-status.is-err{color:#9b3a2e}
+.rx-schedule{background:linear-gradient(180deg,#0b1312 0%,var(--rx-black) 100%);border-top:1px solid #ffffff14;padding:clamp(70px,9vw,120px) max(6vw,24px)}
+.rx-schedule-glow{position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 80% at 85% 50%,#10485042,transparent 70%),radial-gradient(ellipse 45% 60% at 15% 20%,#a9ceca10,transparent 70%)}
+.rx-schedule-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(36px,6vw,100px);align-items:center}
+.rx-schedule-copy h2{font-size:clamp(36px,4.8vw,72px);line-height:1;letter-spacing:-.045em;font-weight:450;color:#fff;text-wrap:balance}
+.rx-schedule-action{max-width:560px}
+.rx-schedule-desc{font-size:16px;line-height:1.75;color:var(--rx-muted-d);margin-bottom:24px}
+.rx-schedule-meta{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:32px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--rx-green)}
+.rx-schedule-meta i{width:4px;height:4px;border-radius:50%;background:#ffffff38;display:inline-block}
+.rx-schedule-btn{border:0;font-family:inherit;cursor:pointer;gap:12px;padding:18px 28px;font-size:14px}
+.rx-schedule-btn span{margin-left:10px}
 
 /* ---------- Work + services intros sit on the new system; work grid on paper ---------- */
 .studio-work-page .sec.wrap{background:var(--rx-paper)}
@@ -236,7 +246,7 @@
   .rx-steps{grid-template-columns:repeat(3,1fr)}
 }
 @media(max-width:800px){
-  .rx-story,.rx-feature,.rx-contact{grid-template-columns:1fr}
+  .rx-story,.rx-feature,.rx-contact,.rx-schedule-grid{grid-template-columns:1fr}
   .rx-story-media{aspect-ratio:4/3}
   .rx-vm-grid{flex-direction:column;min-height:0}
   .rx-vm-panel{min-height:280px}
@@ -414,3 +424,46 @@
 .dimensional-reel .reel-more{position:absolute;z-index:3;left:50%;bottom:clamp(36px,4.5vw,72px);transform:translateX(-50%);display:inline-flex;align-items:center;gap:18px;padding:13px 22px;border:1px solid rgba(237,243,239,.35);border-radius:100px;color:#edf3ef;font-size:14px;white-space:nowrap;transition:background-color .3s,color .3s,border-color .3s}
 .dimensional-reel .reel-more:hover{background:#edf3ef;color:#104850;border-color:#edf3ef}
 .dimensional-reel .reel-more:focus-visible{outline:2px solid #9fc9c4;outline-offset:3px}
+
+/* ==================== Our Products ==================== */
+.rx-products{padding:clamp(80px,10vw,140px) max(6vw,24px) clamp(110px,13vw,180px)}
+.rx-products-head{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(28px,5vw,80px);align-items:end;margin-bottom:clamp(50px,7vw,96px)}
+.rx-products-head h2{font-size:clamp(38px,5.2vw,80px);line-height:1;letter-spacing:-.045em;font-weight:450;text-wrap:balance;color:#132a29}
+.rx-products-lead{font-size:16px;line-height:1.8;color:var(--rx-muted-l);max-width:48ch;justify-self:end}
+.rx-products-list{display:flex;flex-direction:column;gap:clamp(64px,8vw,120px)}
+.rx-product-card{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(32px,5vw,80px);align-items:center;padding-top:clamp(40px,5vw,64px);border-top:1px solid #10485020}
+.rx-product-card.is-reversed .rx-product-media{order:2}
+.rx-product-media{position:relative;display:block;aspect-ratio:16/10;border-radius:18px;overflow:hidden;background:var(--rx-black);box-shadow:0 28px 60px -24px #10485038}
+.rx-product-media img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--rx-out)}
+@media(hover:hover) and (pointer:fine){.rx-product-media:hover img{transform:scale(1.04)}}
+.rx-product-badge{position:absolute;top:18px;left:18px;padding:7px 13px;border-radius:100px;background:rgba(6,9,8,.78);backdrop-filter:blur(8px);color:var(--rx-green);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.rx-product-cat{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rx-teal);margin-bottom:14px}
+.rx-product-copy h3{font-size:clamp(34px,3.8vw,56px);line-height:1.02;letter-spacing:-.04em;font-weight:450;color:#132a29;margin-bottom:18px}
+.rx-product-copy h3 a{transition:color .3s}
+.rx-product-copy h3 a:hover{color:var(--rx-teal)}
+.rx-product-excerpt{font-size:clamp(18px,1.4vw,21px);line-height:1.5;color:#132a29;font-weight:450;margin-bottom:16px}
+.rx-product-summary{font-size:15px;line-height:1.75;color:var(--rx-muted-l);margin-bottom:24px}
+.rx-product-modules{margin-bottom:24px;padding:18px 20px;border-radius:14px;background:var(--rx-paper-2);border:1px solid #1048501c}
+.rx-product-modules-label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rx-teal);margin-bottom:10px}
+.rx-product-modules ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}
+.rx-product-modules li{font-size:13px;color:#264240;position:relative;padding-left:14px;line-height:1.45}
+.rx-product-modules li:before{content:'';position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--rx-teal)}
+.rx-product-copy .rx-tags{margin-top:0;margin-bottom:28px}
+.rx-product-actions{display:flex;flex-wrap:wrap;align-items:center;gap:22px}
+.rx-product-btn{display:inline-flex;align-items:center;gap:16px;padding:16px 26px;border-radius:100px;background:var(--rx-teal);color:var(--rx-paper);font-size:14px;font-weight:500;transition:background .3s,transform .16s var(--rx-out)}
+.rx-product-btn span{transition:transform .45s var(--rx-out)}
+.rx-product-btn:active{transform:scale(.97)}
+@media(hover:hover) and (pointer:fine){.rx-product-btn:hover{background:var(--rx-black)}.rx-product-btn:hover span{transform:translateX(4px)}}
+.rx-product-demo{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--rx-teal);padding-bottom:4px;border-bottom:1px solid #10485040;transition:color .3s,border-color .3s}
+.rx-product-demo:hover{color:var(--rx-black);border-color:var(--rx-black)}
+.rx-products-empty{padding:48px 0;font-size:16px;color:var(--rx-muted-l)}
+.cs-product-overview .cs-statement{font-size:clamp(28px,3.6vw,52px);line-height:1.15;max-width:26ch}
+.cs-product-cta{margin-top:34px}
+@media(max-width:900px){
+  .rx-products-head,.rx-product-card{grid-template-columns:1fr}
+  .rx-products-lead{justify-self:start}
+  .rx-product-card.is-reversed .rx-product-media{order:0}
+}
+@media(max-width:560px){
+  .rx-product-modules ul{grid-template-columns:1fr}
+}
