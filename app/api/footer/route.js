@@ -58,6 +58,7 @@ export async function PUT(req) {
       [JSON.stringify(cleaned)]
     );
     revalidatePath('/', 'layout');
+    revalidatePath('/contact');
     return Response.json({ ok: true });
   } catch (error) {
     console.error('Footer save failed', error);
