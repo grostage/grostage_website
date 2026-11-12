@@ -21,6 +21,8 @@ const SITE_URL = 'https://grostage.com';
 const SITE_NAME = 'Grostage';
 const RAW_GA_ID = (process.env.NEXT_PUBLIC_GA_ID || '').trim();
 const GA_ID = /^G-[A-Z0-9]+$/i.test(RAW_GA_ID) ? RAW_GA_ID : '';
+const RAW_META_PIXEL_ID = (process.env.NEXT_PUBLIC_META_PIXEL_ID || '').trim();
+const META_PIXEL_ID = /^\d{6,20}$/.test(RAW_META_PIXEL_ID) ? RAW_META_PIXEL_ID : '';
 const DEFAULT_TITLE = 'Grostage — Built for your next stage';
 const DEFAULT_DESCRIPTION = 'AI-powered digital products, business technology and growth. Grostage brings strategy, design and technology together to move your business forward.';
 const DEFAULT_OG_IMAGE = '/projects/profile-13-0.jpeg';
@@ -118,6 +120,31 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', ${JSON.stringify(GA_ID)});`}
             </Script>
+          </>
+        )}
+        {META_PIXEL_ID && (
+          <>
+            <Script id="meta-pixel" strategy="afterInteractive">
+              {`!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', ${JSON.stringify(META_PIXEL_ID)});
+fbq('track', 'PageView');`}
+            </Script>
+            <noscript>
+              <img
+                height="1"
+                width="1"
+                style={{ display: 'none' }}
+                src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+                alt=""
+              />
+            </noscript>
           </>
         )}
       </body>

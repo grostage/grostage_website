@@ -1,28 +1,16 @@
 'use client';
 import { useRef, useState } from 'react';
 import Link from 'next/link';
-import { gsap, ScrollTrigger, useGSAP, ready } from '@/frontend/lib/gsap';
-import Magnetic from './Magnetic';
+import { gsap, ScrollTrigger, useGSAP } from '@/frontend/lib/gsap';
 import HeroVideo from './HeroVideo';
 
 export function StageHero() {
   const root = useRef(null);
   useGSAP(() => {
     const mm = gsap.matchMedia();
-    let alive = true;
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const hero = root.current;
-      const intro = gsap.timeline({ paused: true })
-        .fromTo(hero.querySelector('.hero-stage-eyebrow'), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .65, ease: 'power3.out' })
-        .fromTo(hero.querySelectorAll('.hero-stage-title-line > span'), { yPercent: 110 }, { yPercent: 0, duration: 1, stagger: .12, ease: 'power4.out' }, .12)
-        .fromTo(hero.querySelector('.hero-stage-description'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .7, ease: 'power3.out' }, .62)
-        .fromTo(hero.querySelector('.hero-stage-actions'), { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .6, ease: 'power3.out' }, .78);
-      ready().then(() => { if (alive) intro.play(); });
-      gsap.to(hero.querySelector('.hero-stage-title'), { yPercent: 25, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1 } });
-      return () => intro.kill();
-    });
     mm.add('(pointer: fine) and (prefers-reduced-motion: no-preference)', () => {
       const el = root.current, art = el.querySelector('.stage-art');
+      if (!art) return undefined;
       const x = gsap.quickTo(art, 'x', { duration: 1.2, ease: 'power3.out' });
       const y = gsap.quickTo(art, 'y', { duration: 1.2, ease: 'power3.out' });
       const move = e => { const b = el.getBoundingClientRect(); x((e.clientX / b.width - .5) * 40); y(((e.clientY - b.top) / b.height - .5) * 35); };
@@ -30,22 +18,12 @@ export function StageHero() {
       el.addEventListener('pointermove', move); el.addEventListener('pointerleave', leave);
       return () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave); };
     });
-    return () => { alive = false; mm.revert(); };
+    return () => { mm.revert(); };
   }, { scope: root });
   return <section className="stage-hero hero-stage" data-nav-theme="dark" ref={root}>
+    <h1 className="sr-only">Grostage — Software that transforms operations.</h1>
     <HeroVideo />
-    <div className="hero-stage-content">
-      <p className="hero-stage-eyebrow"><i aria-hidden="true" /> INDEPENDENT MINDS. CONNECTED THINKING.</p>
-      <h1 className="stage-title hero-stage-title">
-        <span className="hero-stage-title-line"><span>Software that</span></span>
-        <span className="hero-stage-title-line hero-stage-title-accent"><span>transforms operations.</span></span>
-      </h1>
-      <p className="hero-stage-description">We replace fragmented processes with unified, custom-built digital systems designed for long-term operational excellence.</p>
-    </div>
     <a className="stage-scroll" href="#hx-about">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></a>
-    <div className="hero-stage-actions">
-      <Magnetic><Link className="stage-pill" href="/work" data-cursor="Explore">Step into our work <span aria-hidden="true">↗</span></Link></Magnetic>
-    </div>
   </section>;
 }
 

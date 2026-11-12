@@ -110,14 +110,14 @@ export default function MarketingHero() {
         <div className="marketing-video-blend" />
       </div>
 
-      <div className="marketing-hero-content hero-stage-content">
+      {/* <div className="marketing-hero-content hero-stage-content">
         <p className="marketing-eyebrow hero-stage-eyebrow"><i aria-hidden="true" /> MARKETING SERVICES</p>
         <h1 id="marketing-title" className="marketing-title hero-stage-title">
           <span className="marketing-title-line hero-stage-title-line"><span>Creative that</span></span>
           <span className="marketing-title-line marketing-title-accent hero-stage-title-line hero-stage-title-accent"><span>drives growth.</span></span>
         </h1>
         <p className="marketing-description hero-stage-description">We connect bold ideas, standout content and smart campaigns to meaningful business growth.</p>
-      </div>
+      </div> */}
 
       <a className="stage-scroll" href="#marketing-possibilities">
         SCROLL TO DISCOVER <span aria-hidden="true">V</span>
