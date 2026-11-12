@@ -2,11 +2,11 @@ import { fileURLToPath } from 'node:url';
 
 const buildCsp = isDev => [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://app.cal.com https://*.cal.com https://www.googletagmanager.com`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://app.cal.com https://*.cal.com https://www.googletagmanager.com https://*.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline' https://app.cal.com https://*.cal.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.emailjs.com https://app.cal.com https://*.cal.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+  "connect-src 'self' https://api.emailjs.com https://app.cal.com https://*.cal.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com",
   "frame-src 'self' https://app.cal.com https://*.cal.com https://www.youtube.com https://www.youtube-nocookie.com",
   "media-src 'self'",
   "object-src 'none'",
